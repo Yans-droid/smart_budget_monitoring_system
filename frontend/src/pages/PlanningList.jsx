@@ -5,7 +5,7 @@ import { planningApi } from '../api/planningApi'
 import s from './PlanningList.module.css'
 import { formatRp } from '../utils/format'
 
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // Badge status upload header (ACTIVE, FAILED, dsb.)
 function StatusHeaderBadge({ status }) {
@@ -21,21 +21,22 @@ function StatusHeaderBadge({ status }) {
 // Badge status_realisasi per baris planning_detail
 function RealisasiBadge({ status }) {
   const cfg = {
-    OPEN:   { cls: s.badgeOpen,   label: '⬜ OPEN' },
+    OPEN: { cls: s.badgeOpen, label: '⬜ OPEN' },
     PROSES: { cls: s.badgeProses, label: '🟡 PROSES' },
     CLOSED: { cls: s.badgeClosed, label: '✅ CLOSED' },
+    CANCELLED: { cls: s.badgeCancelled, label: '🚫 CANCELLED' },
   }[status] || { cls: s.badgeOpen, label: '⬜ OPEN' }
   return <span className={cfg.cls}>{cfg.label}</span>
 }
 
 export default function PlanningList() {
   const queryClient = useQueryClient()
-  
-  const [periode, setPeriode]           = useState('')
-  const [filterMonth, setFilterMonth]   = useState('')
-  const [search, setSearch]             = useState('')
-  const [expanded, setExpanded]         = useState(null)
-  const [details, setDetails]           = useState({})
+
+  const [periode, setPeriode] = useState('')
+  const [filterMonth, setFilterMonth] = useState('')
+  const [search, setSearch] = useState('')
+  const [expanded, setExpanded] = useState(null)
+  const [details, setDetails] = useState({})
   const [detailLoading, setDetailLoading] = useState(false)
 
   // Fetch Headers Query
@@ -64,7 +65,7 @@ export default function PlanningList() {
       if (filterMonth) params.month = filterMonth
       const res = await planningApi.getDetails(id, params)
       setDetails(prev => ({ ...prev, [id]: res.data?.data || [] }))
-    } catch {}
+    } catch { }
     finally { setDetailLoading(false) }
   }
 
@@ -88,6 +89,18 @@ export default function PlanningList() {
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Gagal menghapus planning')
+    }
+  }
+  async function handleCancelDetail(headerId, detailId) {
+    if (!confirm('Batalkan item Planning ini?')) return
+    try {
+      const res = await planningApi.cancelPlanningDetail(detailId)
+      if (res.data?.success) {
+        toast.success('Item Planning berhasil dibatalkan')
+        fetchDetails(headerId)  // refresh panel yang lagi terbuka
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Gagal membatalkan item Planning')
     }
   }
 
@@ -177,7 +190,7 @@ export default function PlanningList() {
                       <table className={s.table}>
                         <thead>
                           <tr>
-                            {['Bulan', 'Kategori', 'Item', 'Planning Amount', 'Remarks', 'Status Realisasi'].map(c => (
+                            {['Bulan', 'Kategori', 'Item', 'Planning Amount', 'Remarks', 'Status Realisasi', 'Aksi'].map(c => (
                               <th key={c}>{c}</th>
                             ))}
                           </tr>
@@ -203,34 +216,45 @@ export default function PlanningList() {
                               </tr>
                             )
                             : (details[h.id] || [])
-                                .filter(d => {
-                                  if (!search) return true;
-                                  const q = search.toLowerCase();
-                                  return (
-                                    (d.item || '').toLowerCase().includes(q) ||
-                                    (d.kategori_kode || '').toLowerCase().includes(q) ||
-                                    (d.kategori_nama || '').toLowerCase().includes(q) ||
-                                    (d.kategori_tipe_formulir || '').toLowerCase().includes(q)
-                                  );
-                                })
-                                .map(d => (
-                              <tr key={d.id}>
-                                <td>{d.month}</td>
-                                <td className={s.muted}>
-                                  <strong>{d.kategori_kode || d.kategori_id || '-'}</strong>
-                                  {d.kategori_nama && <div>{d.kategori_nama}</div>}
-                                  {d.kategori_tipe_formulir && <div style={{fontSize: '0.8em', color: '#888'}}>({d.kategori_tipe_formulir})</div>}
-                                </td>
-                                <td>{d.item}</td>
-                                <td className={s.right}>
-                                  {formatRp(d.planning_amount)}
-                                </td>
-                                <td className={s.muted}>{d.remarks || '-'}</td>
-                                <td>
-                                  <RealisasiBadge status={d.status_realisasi} />
-                                </td>
-                              </tr>
-                            ))
+                              .filter(d => {
+                                if (!search) return true;
+                                const q = search.toLowerCase();
+                                return (
+                                  (d.item || '').toLowerCase().includes(q) ||
+                                  (d.kategori_kode || '').toLowerCase().includes(q) ||
+                                  (d.kategori_nama || '').toLowerCase().includes(q) ||
+                                  (d.kategori_tipe_formulir || '').toLowerCase().includes(q)
+                                );
+                              })
+                              .map(d => (
+                                <tr key={d.id}>
+                                  <td>{d.month}</td>
+                                  <td className={s.muted}>
+                                    <strong>{d.kategori_kode || d.kategori_id || '-'}</strong>
+                                    {d.kategori_nama && <div>{d.kategori_nama}</div>}
+                                    {d.kategori_tipe_formulir && <div style={{ fontSize: '0.8em', color: '#888' }}>({d.kategori_tipe_formulir})</div>}
+                                  </td>
+                                  <td>{d.item}</td>
+                                  <td className={s.right}>
+                                    {formatRp(d.planning_amount)}
+                                  </td>
+                                  <td className={s.muted}>{d.remarks || '-'}</td>
+                                  <td>
+                                    <RealisasiBadge status={d.status_realisasi} />
+                                  </td>
+                                  <td>
+                                    {d.status_realisasi === 'OPEN' && (
+                                      <button
+                                        onClick={() => handleCancelDetail(h.id, d.id)}
+                                        className={s.deleteBtn}
+                                        title="Batalkan item Planning"
+                                      >
+                                        Batalkan
+                                      </button>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))
                           }
                         </tbody>
                       </table>

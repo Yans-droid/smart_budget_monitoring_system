@@ -4,6 +4,7 @@ from services.planning.planning_header_service import PlanningHeaderService
 from services.planning.planning_detail_service import PlanningDetailService
 from models.planning_header import PlanningHeader
 from models.planning_detail import PlanningDetail
+from utils.auth import role_required
 from utils.db import db
 
 planning_bp = Blueprint("planning", __name__)
@@ -113,3 +114,35 @@ def get_planning_details(header_id):
         "total": len(details),
         "data": [d.to_dict() for d in details]
     }), 200
+@planning_bp.route("/cancelled", methods=["GET"])
+def get_cancelled_planning():
+    """
+    Daftar item Planning (planning_detail) yang statusnya CANCELLED,
+    untuk ditampilkan saat card 'Dibatalkan' di dashboard diklik.
+    """
+    periode = request.args.get("periode")
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
+ 
+    query = PlanningDetail.query.join(
+        PlanningHeader, PlanningDetail.planning_header_id == PlanningHeader.id
+    ).filter(PlanningDetail.status_realisasi == "CANCELLED")
+ 
+    if periode:
+        query = query.filter(PlanningHeader.periode == periode)
+ 
+    pagination = query.order_by(PlanningDetail.id.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+ 
+    return jsonify({
+        "success": True,
+        "data": [d.to_dict() for d in pagination.items],
+        "total": pagination.total,
+        "pages": pagination.pages
+    }), 200
+@planning_bp.route("/detail/<int:planning_detail_id>/cancel", methods=["POST"])
+@role_required('admin')
+def cancel_planning_detail(planning_detail_id):
+    result, status = PlanningDetailService.cancel_planning_detail(planning_detail_id)
+    return jsonify(result), status

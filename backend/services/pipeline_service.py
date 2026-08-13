@@ -158,7 +158,8 @@ class PipelineService:
             PlanningHeader, PlanningDetail.planning_header_id == PlanningHeader.id
         ).filter(
             PlanningHeader.periode == periode,
-            PlanningHeader.status == "SUCCES"
+            PlanningHeader.status == "SUCCES",
+            PlanningDetail.status_realisasi != "CANCELLED"
         ).scalar() or 0
 
         total_used_amount = db.session.query(func.sum(PrPoData.total_price)).filter(
@@ -185,6 +186,20 @@ class PipelineService:
             PrPoData.gr_legal_number.isnot(None)
         ).scalar() or 0
 
+        # 8. Cancelled Planning (count and amount)
+        cancelled_items = db.session.query(
+            func.count(PlanningDetail.id),
+            func.sum(PlanningDetail.planning_amount)
+        ).join(
+            PlanningHeader, PlanningDetail.planning_header_id == PlanningHeader.id
+        ).filter(
+            PlanningHeader.periode == periode,
+            PlanningDetail.status_realisasi == "CANCELLED"
+        ).first()
+
+        cancelled_count = cancelled_items[0] or 0
+        cancelled_amount = float(cancelled_items[1] or 0)
+
         return {
             "success": True,
             "data": {
@@ -199,7 +214,9 @@ class PipelineService:
                 "remaining_budget": float(remaining_budget),
                 "pr_stage": pr_stage,
                 "po_stage": po_stage,
-                "gr_stage": gr_stage
+                "gr_stage": gr_stage,
+                "cancelled_count": cancelled_count,
+                "cancelled_amount": cancelled_amount
             }
         }
     @staticmethod

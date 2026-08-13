@@ -4,7 +4,8 @@ import time
 from models.kategori import Kategori
 from models.pr_po_data import PrPoData
 from models.klasifikasi_log import KlasifikasiLog
-from ai.regex_engine import regex_predict, detect_budget_type
+from ai.regex_engine import regex_predict
+from ai.rule_base import detect_budget_type
 from ai.preprocess import clean_text
 from utils.db import db
 

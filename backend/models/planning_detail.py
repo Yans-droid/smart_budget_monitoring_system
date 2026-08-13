@@ -35,7 +35,7 @@ class PlanningDetail(db.Model):
         db.String(255)
     )
     status_realisasi = db.Column(
-        db.Enum('OPEN', 'PROSES', 'CLOSED'),
+        db.Enum('OPEN', 'PROSES', 'CLOSED', 'CANCELLED','CANCELLED'),
         nullable=False,
         default='OPEN',
         comment="Agregat status realisasi dari semua PR yang di-mapping ke item ini"

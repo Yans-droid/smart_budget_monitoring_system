@@ -23,4 +23,11 @@ export const planningApi = {
   // Delete Planning
   delete: (id) =>
     api.delete(`/planning/${id}`),
+
+
+  cancelPlanningDetail: (planningDetailId) =>
+    api.post(`/planning/detail/${planningDetailId}/cancel`),
+
+  getCancelled: (params = {}) =>
+    api.get('/planning/cancelled', { params }),
 }

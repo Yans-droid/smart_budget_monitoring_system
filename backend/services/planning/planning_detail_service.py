@@ -1,3 +1,4 @@
+from models.pr_po_data import PrPoData
 from models.planning_detail import PlanningDetail
 from utils.db import db
 
@@ -66,3 +67,40 @@ class PlanningDetailService:
             "success": True,
             "message": "Planning detail berhasil dihapus"
         }, 200
+    @staticmethod
+    def cancel_planning_detail(id):
+        detail= db.session.get(PlanningDetail, id)
+        if not detail:
+            return {
+                "success": False,
+                "message": "Planning detail tidak ditemukan"
+            }, 404
+        
+        if detail.status_realisasi =="CANCELLED":
+            return {
+                "success": False,
+                "message":"Planning detail sudah dibatalkan"
+            }, 400
+        check = PrPoData.query.filter_by(planning_detail_id=id).count()
+        if check > 0:
+            return {
+                "success": False,
+                "message": f"Tidak bisa dibatalkan — masih ada {check} PR terkait item Planning ini. "
+                            f"Batalkan mapping PR-nya terlebih dahulu."
+            }, 409
+ 
+        detail.status_realisasi = "CANCELLED"
+        db.session.commit()
+ 
+        return {
+            "success": True,
+            "message": "Item Planning berhasil dibatalkan",
+            "data": {
+                "id": detail.id,
+                "item": detail.item,
+                "status_realisasi": detail.status_realisasi
+            }
+        }, 200
+ 
+        
+        

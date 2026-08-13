@@ -12,6 +12,7 @@ import AllMonthlyDetailModal from '../components/AllMonthlyDetailModal'
 import PrStatusModal from '../components/PrStatusModal'
 import PrTrackingModal from '../components/PrTrackingModal'
 import MonthlyPipelineChart from '../components/MonthlyPipelineChart'
+import CancelledPlanningModal from '../components/CancelledPlanningModal'
 import { budgetApi } from '../api/budgetApi'
 import { prApi } from '../api/prApi'
 import { formatRp } from '../utils/format'
@@ -27,6 +28,7 @@ export default function Dashboard() {
   const [error, setError] = useState('')
   const [isExporting, setIsExporting] = useState(false)
   const dashboardRef = useRef(null)
+  const [showCancelledPlanningModal, setShowCancelledPlanningModal] = useState(false)
 
   const handleExportAll = async () => {
     if (!dashboardRef.current) return
@@ -286,6 +288,13 @@ export default function Dashboard() {
               sub="Total Plan - Used"
               variant={(prSummary?.remaining_budget || 0) < 0 ? 'danger' : 'success'}
             />
+            <MetricCard
+              label="Dibatalkan"
+              value={prSummary?.cancelled_count || 0}
+              sub={`${formatRp(prSummary?.cancelled_amount || 0)}`}
+              variant="danger"
+              onClick={() => setShowCancelledPlanningModal(true)}
+            />
           </div>
         </section>
 
@@ -369,6 +378,12 @@ export default function Dashboard() {
           }}
         />
       ) : null}
+      {showCancelledPlanningModal && (
+        <CancelledPlanningModal
+          periode={CURRENT_YEAR}
+          onClose={() => { setShowCancelledPlanningModal(false); fetchSummary(); }}
+        />
+      )}
     </div>
   )
 }
