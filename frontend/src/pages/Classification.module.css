@@ -1,0 +1,512 @@
+.page {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.header h1 {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.header p {
+  font-size: 12px;
+  color: #73726c;
+  margin-top: 2px;
+}
+
+/* summary metric strip */
+.metricStrip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.metricBox {
+  background: #fff;
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metricLabel {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #73726c;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.metricValue {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+}
+
+.metricSub {
+  font-size: 11px;
+  color: #73726c;
+}
+
+/* toolbar */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.searchWrap {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #73726c;
+  pointer-events: none;
+}
+
+.searchInput {
+  padding: 7px 10px 7px 30px;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: inherit;
+  background: #fff;
+  outline: none;
+  width: 220px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.searchInput:focus {
+  border-color: rgba(55, 138, 221, 0.5);
+  box-shadow: 0 0 0 2px rgba(55, 138, 221, 0.1);
+}
+
+.filterBtn {
+  padding: 7px 12px;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  color: #73726c;
+  transition: background 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.filterBtn:hover {
+  background: #f5f5f3;
+}
+
+.filterActive {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.filterActive:hover {
+  background: #333;
+}
+
+/* main card (table) */
+.tableCard {
+  background: #fff;
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+}
+
+.tableTitle {
+  font-size: 11px;
+  font-weight: 500;
+  color: #73726c;
+  letter-spacing: 0.04em;
+}
+
+.tableCount {
+  font-size: 11px;
+  color: #73726c;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.tableWrap table {
+  min-width: 860px;
+}
+
+.tableWrap th {
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  background: #fafaf9;
+}
+
+.tableWrap td {
+  padding: 9px 12px;
+  vertical-align: middle;
+}
+
+.cellTruncate {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cellRight {
+  text-align: right;
+}
+
+.cellCenter {
+  text-align: center;
+}
+
+.cellMono {
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+}
+
+/* badges */
+.badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.badgeE1 {
+  background: #E6F1FB;
+  color: #0C447C;
+}
+
+.badgeE9 {
+  background: #E1F5EE;
+  color: #085041;
+}
+
+.badgeI1 {
+  background: #EEEDFE;
+  color: #3C3489;
+}
+
+.badgeCap {
+  background: #FAEEDA;
+  color: #633806;
+}
+
+.badgeUnk {
+  background: #f5f5f3;
+  color: #73726c;
+}
+
+/* method tags */
+.methodTag {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.methodRule {
+  background: #EDFAF4;
+  color: #085041;
+}
+
+.methodSvm {
+  background: #EBF4FF;
+  color: #0C447C;
+}
+
+.methodLow {
+  background: #FEF2F2;
+  color: #991B1B;
+}
+
+/* confidence bar */
+.confBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.confTrack {
+  width: 48px;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.confFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.confHigh {
+  background: #1D9E75;
+}
+
+.confMid {
+  background: #BA7517;
+}
+
+.confLow {
+  background: #e85d3a;
+}
+
+.confText {
+  font-size: 11px;
+  color: #73726c;
+  min-width: 30px;
+}
+
+/* status dot */
+.statusDot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotApproved {
+  background: #1D9E75;
+}
+
+.dotPending {
+  background: #BA7517;
+}
+
+.dotRejected {
+  background: #e85d3a;
+}
+
+/* pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px 14px;
+  border-top: 0.5px solid rgba(0, 0, 0, 0.06);
+}
+
+.pageInfo {
+  font-size: 11px;
+  color: #73726c;
+}
+
+.pageButtons {
+  display: flex;
+  gap: 4px;
+}
+
+.pageBtn {
+  padding: 5px 10px;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  color: #73726c;
+  transition: all 0.15s;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: #f5f5f3;
+}
+
+.pageBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pageBtnActive {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.pageBtnActive:hover {
+  background: #333;
+}
+
+/* empty state */
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  color: #73726c;
+}
+
+.emptyIcon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.emptyTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.emptySub {
+  font-size: 12px;
+}
+
+/* row hover */
+.tableWrap tbody tr {
+  transition: background 0.1s;
+}
+
+.tableWrap tbody tr:hover {
+  background: #fafaf9;
+}
+
+/* date cell */
+.dateText {
+  font-size: 11px;
+  color: #73726c;
+}
+
+/* ── Responsive ── */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .metricStrip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .metricStrip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbarLeft,
+  .toolbarRight {
+    flex-wrap: wrap;
+  }
+
+  .searchInput {
+    width: 100%;
+  }
+
+  .searchWrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .filterBtn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .tableHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px 14px 8px;
+  }
+
+  .cellTruncate {
+    max-width: 120px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .pageButtons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .page {
+    padding: 0.75rem;
+    gap: 10px;
+  }
+
+  .metricStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .metricBox {
+    padding: 10px 12px;
+  }
+
+  .metricValue {
+    font-size: 18px;
+  }
+
+  .cellTruncate {
+    max-width: 90px;
+  }
+}
+
+.badgeUnk {
+  background: #f5f5f3;
+  color: #73726c;
+  border: 0.5px solid rgba(0, 0, 0, 0.15);
+}

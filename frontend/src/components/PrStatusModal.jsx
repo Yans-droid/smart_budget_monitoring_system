@@ -1,0 +1,166 @@
+import { useState, useEffect } from 'react'
+import s from './PrStatusModal.module.css'
+import { prPoDataApi } from '../api/prPoDataApi'
+import { mappingApi } from '../api/mappingApi'
+import { formatRp } from '../utils/format'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
+
+export default function PrStatusModal({ status, onClose }) {
+    const [prList, setPrList] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [processingId, setProcessingId] = useState(null)
+
+    const isOopView = status === 'OOP'
+
+    useEffect(() => {
+        fetchData()
+    }, [status])
+
+    async function fetchData() {
+        setLoading(true)
+        try {
+            const params = { per_page: 50, budget_status: status }
+            const res = await prPoDataApi.getAll(params)
+            if (res.success) {
+                setPrList(res.data || [])
+            }
+        } catch (err) {
+            console.error('Error fetching PR status list:', err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function handleUndo(prId) {
+        if (!confirm('Batalkan status OOP item ini dan kembalikan ke antrian Review Mapping?')) return
+
+        setProcessingId(prId)
+        try {
+            const res = await mappingApi.undoMapping(prId)
+            if (res.data?.success) {
+                setPrList(prev => prev.filter(p => p.id !== prId))
+            } else {
+                alert(res.data?.message || 'Gagal membatalkan status OOP')
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || 'Gagal membatalkan status OOP')
+        } finally {
+            setProcessingId(null)
+        }
+    }
+
+    const title = {
+        ON_PLAN: 'ON PLAN (Dalam Budget)',
+        OVER_PLAN: 'OVER BUDGET (Melebihi Budget)',
+        UNDER_PLAN: 'UNDER PLAN (Dibawah Budget)',
+        OOP: 'OOP (Out of Plan)',
+    }[status] || status
+
+    const handleExportPDF = () => {
+        const doc = new jsPDF()
+
+        doc.setFontSize(16)
+        doc.text(`Laporan PR/PO - ${title}`, 14, 20)
+
+        doc.setFontSize(10)
+        doc.text(`Total Data: ${prList.length}`, 14, 28)
+
+        const tableColumn = ["PR Doc", "Description", "Supplier", "Nilai", "Kategori"]
+        const tableRows = []
+
+        prList.forEach(pr => {
+            const prData = [
+                pr.pr_doc_num || '-',
+                pr.description || '-',
+                pr.supplier_name || '-',
+                formatRp(pr.total_price),
+                pr.kategori_kode || '-'
+            ]
+            tableRows.push(prData)
+        })
+
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 32,
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [30, 41, 59] } // dark blue/gray
+        })
+
+        doc.save(`Laporan_${status}_${new Date().getTime()}.pdf`)
+    }
+
+    return (
+        <div className={s.overlay} onClick={onClose}>
+            <div className={s.modal} onClick={e => e.stopPropagation()}>
+                <div className={s.header}>
+                    <div className={s.headerLeft}>
+                        <h2>Detail {title}</h2>
+                        <p>Daftar PR/PO dengan status {status}</p>
+                    </div>
+                    <div className={s.headerActions}>
+                        {prList.length > 0 && (
+                            <button
+                                onClick={handleExportPDF}
+                                className={s.exportBtn}
+                            >
+                                📄 Export PDF
+                            </button>
+                        )}
+                        <button className={s.closeBtn} onClick={onClose}>✕</button>
+                    </div>
+                </div>
+
+                <div className={s.content}>
+                    {loading ? (
+                        <div className={s.loadingState}>
+                            ⏳ Memuat data...
+                        </div>
+                    ) : prList.length === 0 ? (
+                        <div className={s.emptyState}>
+                            Belum ada data
+                        </div>
+                    ) : (
+                        <div className={s.tableContainer}>
+                            <table className={s.table}>
+                                <thead>
+                                    <tr>
+                                        <th>PR Doc</th>
+                                        <th>Description</th>
+                                        <th className={s.center}>Supplier</th>
+                                        <th className={s.right}>Nilai</th>
+                                        <th className={s.center}>Kategori</th>
+                                        {isOopView && <th className={s.center}>Aksi</th>}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {prList.map((pr, i) => (
+                                        <tr key={pr.id}>
+                                            <td className={s.monospace}>{pr.pr_doc_num || '-'}</td>
+                                            <td className={s.truncate}>{pr.description || '-'}</td>
+                                            <td className={s.center}>{pr.supplier_name || '-'}</td>
+                                            <td className={s.right}>{formatRp(pr.total_price)}</td>
+                                            <td className={s.center}>{pr.kategori_kode || '-'}</td>
+                                            {isOopView && (
+                                                <td className={s.center}>
+                                                    <button
+                                                        className={s.undoBtn}
+                                                        onClick={() => handleUndo(pr.id)}
+                                                        disabled={processingId === pr.id}
+                                                    >
+                                                        {processingId === pr.id ? '...' : '↩️ Batalkan'}
+                                                    </button>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
+}

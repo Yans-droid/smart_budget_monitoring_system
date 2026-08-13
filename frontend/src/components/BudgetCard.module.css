@@ -1,0 +1,130 @@
+.card {
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: opacity .15s;
+    border: 0.5px solid transparent;
+}
+
+.card:hover {
+    opacity: .85;
+}
+
+.card.capex {
+    background: #EBF4FF;
+    border-color: #BDD6F5;
+}
+
+.card.opex {
+    background: #EDFAF4;
+    border-color: #B2E8D4;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.title.capex {
+    color: #0C447C;
+}
+
+.title.opex {
+    color: #085041;
+}
+
+.detailLink {
+    font-size: 11px;
+}
+
+.detailLink.capex {
+    color: #378ADD;
+}
+
+.detailLink.opex {
+    color: #1D9E75;
+}
+
+.value {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.value.capex {
+    color: #0C447C;
+}
+
+.value.opex {
+    color: #085041;
+}
+
+.sub {
+    font-size: 12px;
+    margin-bottom: 0;
+}
+
+.sub.capex {
+    color: #378ADD;
+}
+
+.sub.opex {
+    color: #1D9E75;
+}
+
+.progBg {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progBar {
+    height: 6px;
+    border-radius: 4px;
+    transition: width .3s;
+}
+
+.progBar.capex {
+    background: #378ADD;
+}
+
+.progBar.opex {
+    background: #1D9E75;
+}
+
+.usage {
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.usage.capex {
+    color: #378ADD;
+}
+
+.usage.normal {
+    color: #1D9E75;
+}
+
+.usage.over {
+    color: #e85d3a;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .card {
+        padding: 1rem;
+    }
+
+    .value {
+        font-size: 18px;
+    }
+}

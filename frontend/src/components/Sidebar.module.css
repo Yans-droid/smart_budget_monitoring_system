@@ -1,0 +1,232 @@
+.groupLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.45);
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  margin-top: 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.groupLabel:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.groupLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 6px;
+  margin-top: 4px;
+}
+
+.sidebar {
+    width: 164px;
+    border-right: 0.5px solid rgba(0, 0, 0, 0.1);
+    padding: .75rem 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: #fff;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+    transition: margin-left 0.25s ease, left 0.25s ease;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.sidebarOpen {
+    margin-left: 0;
+}
+
+.sidebarClosed {
+    margin-left: -164px;
+}
+
+.logoWrap {
+    padding: 8px 10px 12px 42px;
+    margin-bottom: 4px;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+
+.logoImg {
+    width: 100%;
+    max-height: 44px;
+    object-fit: contain;
+    object-position: left;
+}
+
+.logoName {
+    font-size: 10px;
+    color: #73726c;
+    margin-top: 6px;
+    line-height: 1.3;
+}
+
+.link {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #73726c;
+    transition: background .15s;
+}
+
+.link:hover {
+    background: #f5f5f3;
+}
+
+.linkActive {
+    background: #f5f5f3;
+    color: #1a1a1a;
+    font-weight: 500;
+}
+
+.spacer {
+    flex: 1;
+}
+
+.footer {
+    padding: 10px 10px 8px;
+    font-size: 11px;
+    color: #73726c;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+}
+
+.footerTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.footerName {
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 3px;
+}
+
+.footerSub {
+    font-size: 10px;
+}
+
+/* role badge */
+.roleBadge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.roleAdmin {
+    background: #E6F1FB;
+    color: #0C447C;
+}
+
+.roleManager {
+    background: #E1F5EE;
+    color: #085041;
+}
+
+/* footer buttons */
+.footerActions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pwdBtn, .logoutBtn {
+    width: 100%;
+    padding: 6px 0;
+    border: 0.5px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    background: transparent;
+    color: #73726c;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.pwdBtn:hover {
+    background: #f5f5f3;
+    color: #1a1a1a;
+}
+
+.logoutBtn:hover {
+    background: #FEF2F2;
+    color: #b91c1c;
+    border-color: rgba(185, 28, 28, 0.2);
+}
+
+/* Hamburger button */
+.hamburger {
+    display: block;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 200;
+    background: #fff;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: left 0.25s ease;
+}
+
+/* Overlay */
+.overlay {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -180px;
+        top: 0;
+        z-index: 100;
+        margin-left: 0;
+    }
+
+    .sidebarOpen {
+        left: 0;
+        margin-left: 0;
+        box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebarClosed {
+        left: -180px;
+        margin-left: 0;
+    }
+
+    .overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 99;
+    }
+}

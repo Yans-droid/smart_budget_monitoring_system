@@ -1,0 +1,22 @@
+import api from './api'
+
+export const mappingApi = {
+  getPending: (params = {}) =>
+    api.get('/mapping/pending', { params }),
+
+  confirmMapping: (prId, data) =>
+    api.post(`/mapping/${prId}/confirm`, data),
+
+  searchPlanningDetail: (prId, keyword) =>
+    api.get('/mapping/planning_detail/search', {
+      params: { pr_id: prId, keyword }
+    }),
+
+  // Daftar item yang ditandai Out of Plan
+  getOopList: (params = {}) =>
+    api.get('/mapping/oop', { params }),
+
+  // Batalkan konfirmasi mapping/OOP sebelumnya, kembalikan ke antrian review
+  undoMapping: (prId) =>
+    api.post(`/mapping/${prId}/undo_mapping`),
+}

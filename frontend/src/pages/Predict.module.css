@@ -1,0 +1,326 @@
+.page {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.header h1 {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.header p {
+    font-size: 12px;
+    color: #73726c;
+    margin-top: 2px;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 14px;
+}
+
+.leftPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rightPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stepCard {
+    background: #fff;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+}
+
+.stepLabel {
+    font-size: 11px;
+    font-weight: 500;
+    color: #73726c;
+    letter-spacing: .04em;
+    margin-bottom: 10px;
+}
+
+.stepList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.stepItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #73726c;
+}
+
+.stepItem.active {
+    color: #1a1a1a;
+}
+
+.stepNum {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #f5f5f3;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.stepNum.done {
+    background: #1D9E75;
+    color: #fff;
+    border-color: #1D9E75;
+}
+
+.stepNum.active {
+    background: #1a1a1a;
+    color: #fff;
+    border-color: #1a1a1a;
+}
+
+.stepLine {
+    width: 1px;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.1);
+    margin-left: 10px;
+}
+
+.fileCard {
+    background: #f5f5f3;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.fileName {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.fileMeta {
+    font-size: 11px;
+    color: #73726c;
+    margin-bottom: 8px;
+}
+
+.fileTags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.fileTag {
+    font-size: 11px;
+    background: #EDFAF4;
+    color: #085041;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.uploadZone {
+    border: 1.5px dashed rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.uploadZone:hover {
+    border-color: rgba(0, 0, 0, 0.3);
+    background: #f5f5f3;
+}
+
+.uploadIcon {
+    font-size: 24px;
+    margin-bottom: 6px;
+    display: block;
+    color: #73726c;
+}
+
+.uploadTitle {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.uploadSub {
+    font-size: 11px;
+    color: #73726c;
+}
+
+.previewCard {
+    background: #fff;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+}
+
+.previewHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.previewLabel {
+    font-size: 11px;
+    font-weight: 500;
+    color: #73726c;
+    letter-spacing: .04em;
+}
+
+.previewActions {
+    display: flex;
+    gap: 8px;
+}
+
+.tableWrap {
+    overflow-x: auto;
+}
+
+.resultCard {
+    background: #fff;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+}
+
+.resultHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.resultLabel {
+    font-size: 11px;
+    font-weight: 500;
+    color: #73726c;
+    letter-spacing: .04em;
+    margin-bottom: 4px;
+}
+
+.resultTags {
+    display: flex;
+    gap: 6px;
+}
+
+.tagRule {
+    font-size: 11px;
+    background: #EDFAF4;
+    color: #085041;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+.tagSvm {
+    font-size: 11px;
+    background: #EBF4FF;
+    color: #0C447C;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.badgeE1 {
+    background: #E6F1FB;
+    color: #0C447C;
+}
+
+.badgeE9 {
+    background: #E1F5EE;
+    color: #085041;
+}
+
+.badgeI1 {
+    background: #EEEDFE;
+    color: #3C3489;
+}
+
+.badgeCap {
+    background: #FAEEDA;
+    color: #633806;
+}
+
+.badgeUnk {
+    background: #f5f5f3;
+    color: #73726c;
+}
+
+.methodText {
+    font-size: 11px;
+    color: #73726c;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .page {
+        padding: 1rem;
+    }
+
+    .content {
+        grid-template-columns: 1fr;
+    }
+
+    .leftPanel {
+        order: 1;
+    }
+
+    .rightPanel {
+        order: 0;
+    }
+
+    .previewHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .previewActions {
+        width: 100%;
+    }
+
+    .previewActions button {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .resultHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page {
+        padding: 0.75rem;
+    }
+
+    .uploadZone {
+        padding: 1rem;
+    }
+}

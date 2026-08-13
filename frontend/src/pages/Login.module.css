@@ -1,0 +1,357 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('../assets/balon.jpg') no-repeat center center/cover;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* animated background orbs */
+.page::before,
+.page::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  pointer-events: none;
+  animation: float 12s ease-in-out infinite alternate;
+}
+
+.page::before {
+  width: 420px;
+  height: 420px;
+  background: rgba(55, 138, 221, 0.25);
+  top: -80px;
+  right: -100px;
+}
+
+.page::after {
+  width: 360px;
+  height: 360px;
+  background: rgba(29, 158, 117, 0.2);
+  bottom: -60px;
+  left: -80px;
+  animation-delay: -6s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(30px, -20px) scale(1.08);
+  }
+}
+
+/* card */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 380px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2.5rem 2rem 2rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* logo section */
+.logoWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.75rem;
+}
+
+.logoImg {
+  height: 77px;
+  width: auto;
+  margin: 0 auto 14px auto;
+  display: block;
+  border-radius: 25%;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 12.5px;
+  color: rgba(203, 213, 225, 0.7);
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.input {
+  padding: 11px 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.input::placeholder {
+  color: rgba(148, 163, 184, 0.5);
+}
+
+.input:focus {
+  border-color: rgba(55, 138, 221, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.15);
+}
+
+.inputError {
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.inputError:focus {
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.passwordWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrap .input {
+  padding-right: 40px;
+  /* space for the eye icon */
+  width: 100%;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: rgba(148, 163, 184, 0.8);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.eyeBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+
+/* submit button */
+.submitBtn {
+  margin-top: 4px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #378ADD, #1D9E75);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(55, 138, 221, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.submitBtn:hover {
+  opacity: 0.92;
+  box-shadow: 0 6px 20px rgba(55, 138, 221, 0.4);
+}
+
+.submitBtn:active {
+  transform: scale(0.98);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* shimmer on button */
+.submitBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.12) 50%,
+      transparent 75%);
+  transform: translateX(-100%);
+  transition: none;
+}
+
+.submitBtn:hover::after {
+  animation: shimmer 0.8s ease-out forwards;
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* error message */
+.error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: #fca5a5;
+  animation: shakeIn 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+@keyframes shakeIn {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(5px);
+  }
+
+  60% {
+    transform: translateX(-3px);
+  }
+
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+/* footer */
+.footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 11px;
+  color: #ffff;
+  line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .page::before {
+    width: 250px;
+    height: 250px;
+  }
+
+  .page::after {
+    width: 200px;
+    height: 200px;
+  }
+
+  .card {
+    padding: 2rem 1.5rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  .logoWrap {
+    margin-bottom: 1.25rem;
+  }
+
+  .logoImg {
+    height: 60px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 11.5px;
+  }
+
+  .input {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .submitBtn {
+    padding: 11px;
+    font-size: 13px;
+  }
+
+  .footer {
+    font-size: 10px;
+  }
+}

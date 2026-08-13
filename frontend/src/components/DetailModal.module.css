@@ -1,0 +1,233 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    background: #fff;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.25rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.headerLeft h2 {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.headerLeft p {
+    font-size: 12px;
+    color: #73726c;
+    margin-top: 2px;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #73726c;
+    padding: 4px;
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: #1a1a1a;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.tab {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #73726c;
+    border: 0.5px solid transparent;
+    background: none;
+}
+
+.tab:hover {
+    background: #f5f5f3;
+}
+
+.tabActive {
+    background: #f5f5f3;
+    color: #1a1a1a;
+    font-weight: 500;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.metricRow {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+
+.metric {
+    background: #f5f5f3;
+    border-radius: 8px;
+    padding: .875rem 1rem;
+}
+
+.metricLabel {
+    font-size: 11px;
+    color: #73726c;
+    margin-bottom: 2px;
+}
+
+.metricValue {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.metricValue.warning {
+    color: #BA7517;
+}
+
+.metricValue.success {
+    color: #085041;
+}
+
+.metricValue.danger {
+    color: #e85d3a;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.badgeE1 {
+    background: #E6F1FB;
+    color: #0C447C;
+}
+
+.badgeE9 {
+    background: #E1F5EE;
+    color: #085041;
+}
+
+.badgeI1 {
+    background: #EEEDFE;
+    color: #3C3489;
+}
+
+.badgeCap {
+    background: #FAEEDA;
+    color: #633806;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .modal {
+        width: 95%;
+        max-height: 90vh;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        padding: 0.875rem;
+    }
+
+    .metricRow {
+        grid-template-columns: 1fr;
+    }
+
+    .headerLeft h2 {
+        font-size: 14px;
+    }
+
+    .tab {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+}
+/* Added for refactoring */
+.loadingState, .emptyState {
+    text-align: center;
+    padding: 40px;
+    color: #73726c;
+}
+
+.emptyState {
+    font-size: 13px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.table th, .table td {
+    padding: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.table th {
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    background: #f1f5f9;
+}
+
+.table th.center {
+    text-align: center;
+}
+
+.table th.right {
+    text-align: right;
+}
+
+.table td.center {
+    text-align: center;
+}
+
+.table td.right {
+    text-align: right;
+    font-weight: 500;
+}
+
+.table td.truncate {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table td.colorMuted {
+    color: #73726c;
+}

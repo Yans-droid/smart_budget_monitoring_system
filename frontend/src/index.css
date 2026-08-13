@@ -1,0 +1,207 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f5f5f3;
+  color: #1a1a1a;
+  font-size: 14px;
+}
+
+:root {
+  --blue: #378ADD;
+  --teal: #1D9E75;
+  --purple: #7F77DD;
+  --red: #e85d3a;
+  --amber: #BA7517;
+  --border: rgba(0, 0, 0, 0.1);
+  --bg: #ffffff;
+  --bg2: #f5f5f3;
+  --text: #1a1a1a;
+  --text2: #73726c;
+}
+
+.card {
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.btn-primary {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
+.btn-secondary {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-secondary:hover {
+  background: #ebebea;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.badge-e1 {
+  background: #E6F1FB;
+  color: #0C447C;
+}
+
+.badge-e9 {
+  background: #E1F5EE;
+  color: #085041;
+}
+
+.badge-i1 {
+  background: #EEEDFE;
+  color: #3C3489;
+}
+
+.badge-cap {
+  background: #FAEEDA;
+  color: #633806;
+}
+
+.badge-unk {
+  background: #f5f5f3;
+  color: #73726c;
+}
+
+.prog-bg {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text2);
+  letter-spacing: .04em;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--text2);
+  border-bottom: 0.5px solid var(--border);
+}
+
+td {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+tr:not(:last-child) td {
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ── App Shell Layout ── */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-main {
+  flex: 1;
+  overflow: auto;
+  background: #f5f5f3;
+  min-width: 0;          /* prevent flex child overflow */
+  padding-top: 44px;     /* space for fixed hamburger button */
+}
+
+/* ── Responsive ── */
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+  .card {
+    padding: 0.875rem 1rem;
+  }
+}
+
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+  body {
+    font-size: 13px;
+  }
+
+  .card {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Small mobile (≤ 480px) */
+@media (max-width: 480px) {
+  body {
+    font-size: 12px;
+  }
+
+  .card {
+    padding: 0.625rem 0.75rem;
+    border-radius: 8px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}

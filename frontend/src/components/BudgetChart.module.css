@@ -1,0 +1,95 @@
+.wrapper {
+    background: #fff;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.title {
+    font-size: 11px;
+    font-weight: 500;
+    color: #73726c;
+    letter-spacing: .04em;
+}
+
+
+.legend {
+    display: flex;
+    gap: 12px;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #73726c;
+}
+
+.chartArea {
+    height: 160px;
+    min-height: 100px;
+    min-width: 0;
+}
+
+.legendDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .wrapper {
+        padding: 0.875rem 1rem;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .legend {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .wrapper {
+        padding: 0.75rem;
+    }
+
+    .legendItem {
+        font-size: 10px;
+    }
+}
+/* Custom Tooltip */
+.tooltip {
+    background: #fff;
+    border: 0.5px solid rgba(0,0,0,0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-size: 11px;
+}
+
+.tooltipLabel {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.legendColorBox {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}

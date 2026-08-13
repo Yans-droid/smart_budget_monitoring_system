@@ -1,0 +1,61 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.env
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+cat > .gitignore << 'EOF'
+# --- Environment & secrets ---
+.env
+.env.local
+.env.*.local
+*.pem
+
+# --- Python / Flask backend ---
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+instance/
+.pytest_cache/
+
+# --- Node / React frontend ---
+node_modules/
+dist/
+build/
+.vite/
+
+# --- Uploaded files ---
+uploads/
+backend/uploads/
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+*.log
+npm-debug.log*
+EOF

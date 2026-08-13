@@ -1,0 +1,100 @@
+.wrapper {
+    background: #fff;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.title {
+    font-size: 11px;
+    font-weight: 500;
+    color: #73726c;
+    letter-spacing: .04em;
+}
+
+.legend {
+    display: flex;
+    gap: 12px;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #73726c;
+}
+
+.chartArea {
+    height: 200px;
+    min-height: 150px;
+    min-width: 0;
+    margin-bottom: 20px;
+}
+
+.legendColorBox {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}
+
+.tooltip {
+    background: #fff;
+    border: 0.5px solid rgba(0,0,0,0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-size: 11px;
+}
+
+.tooltipLabel {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.tableContainer {
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.table th {
+    text-align: left;
+    padding: 8px;
+    color: #73726c;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-weight: 500;
+}
+
+.table td {
+    padding: 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .legend {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
