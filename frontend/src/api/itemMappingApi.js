@@ -15,4 +15,7 @@ export const itemMappingApi = {
 
   delete: (id) =>
     api.delete(`/item-mappings/${id}`),
+
+  getSuggestions: () =>
+    api.get('/item-mappings/suggestions'),
 }

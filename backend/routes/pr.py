@@ -43,6 +43,9 @@ def get_all():
     upload_id = request.args.get("upload_id", type=int)
     status_ai = request.args.get("status_ai")
     tracking_stage = request.args.get("tracking_stage")
+    kategori_id = request.args.get("kategori_id", type=int)
+    search = request.args.get("search")
+    filter_status = request.args.get("filter_status")
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 50, type=int)
 
@@ -50,6 +53,9 @@ def get_all():
         upload_id=upload_id,
         status_ai=status_ai,
         tracking_stage=tracking_stage,
+        kategori_id=kategori_id,
+        search=search,
+        filter_status=filter_status,
         page=page,
         per_page=per_page
     )
@@ -83,6 +89,24 @@ def update_kategori(pr_id):
         return jsonify({"success": False, "message": "user_id wajib diisi"}), 400
 
     result, status = PrService.update_kategori(pr_id, kategori_id, user_id)
+    return jsonify(result), status
+
+
+# ------------------------------------------------------------------
+# Batalkan PR langsung (tanpa melalui cancel planning_detail)
+# POST /api/v1/pr/<pr_id>/cancel
+# Body: { "user_id": 1, "alasan": "Kebutuhan tidak relevan" }
+# ------------------------------------------------------------------
+@pr_bp.route("/<int:pr_id>/cancel", methods=["POST"])
+def cancel_pr(pr_id):
+    data = request.get_json() or {}
+    user_id = data.get("user_id")
+    alasan = data.get("alasan", "").strip() or None
+
+    if not user_id:
+        return jsonify({"success": False, "message": "user_id wajib diisi"}), 400
+
+    result, status = PrService.cancel_pr(pr_id, user_id, alasan)
     return jsonify(result), status
 
 

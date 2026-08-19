@@ -19,8 +19,8 @@ export default function PrTrackingModal({ stage, onClose }) {
   const totalPages = listData?.pages || 1
 
   return (
-    <div style={modalOverlayStyle}>
-      <div style={modalContentStyle}>
+    <div style={modalOverlayStyle} onClick={onClose}>
+      <div style={modalContentStyle} onClick={e => e.stopPropagation()} >
         <div style={headerStyle}>
           <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600 }}>
             Detail Tahapan: {stage} ({total} Data)
@@ -53,11 +53,11 @@ export default function PrTrackingModal({ stage, onClose }) {
                   prList.map((pr, i) => (
                     <tr key={pr.id}>
                       <td style={tdStyle}>{(page - 1) * 30 + i + 1}</td>
-                      <td style={{...tdStyle, fontFamily: 'monospace', fontWeight: 600}}>{pr.pr_doc_num || '-'}</td>
-                      <td style={{...tdStyle, fontFamily: 'monospace', fontWeight: 600}}>{pr.po_doc_num || '-'}</td>
-                      <td style={{...tdStyle, fontFamily: 'monospace', fontWeight: 600}}>{pr.gr_legal_number || '-'}</td>
+                      <td style={{ ...tdStyle, fontFamily: 'monospace', fontWeight: 600 }}>{pr.pr_doc_num || '-'}</td>
+                      <td style={{ ...tdStyle, fontFamily: 'monospace', fontWeight: 600 }}>{pr.po_doc_num || '-'}</td>
+                      <td style={{ ...tdStyle, fontFamily: 'monospace', fontWeight: 600 }}>{pr.gr_legal_number || '-'}</td>
                       <td style={tdStyle} title={pr.description}>{pr.description ? (pr.description.length > 50 ? pr.description.substring(0, 50) + '...' : pr.description) : '-'}</td>
-                      <td style={{...tdStyle, textAlign: 'right'}}>{formatRp(pr.total_price)}</td>
+                      <td style={{ ...tdStyle, textAlign: 'right' }}>{formatRp(pr.total_price)}</td>
                       <td style={tdStyle}>{pr.supplier_name || '-'}</td>
                     </tr>
                   ))
@@ -69,16 +69,16 @@ export default function PrTrackingModal({ stage, onClose }) {
 
         {totalPages > 1 && (
           <div style={footerStyle}>
-            <button 
-              onClick={() => setPage(p => Math.max(1, p - 1))} 
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
               style={pageBtnStyle}
             >
               ‹ Prev
             </button>
             <span style={{ fontSize: '0.875rem' }}>Hal {page} / {totalPages}</span>
-            <button 
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               style={pageBtnStyle}
             >

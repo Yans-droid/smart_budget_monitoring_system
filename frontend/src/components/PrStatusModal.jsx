@@ -12,6 +12,7 @@ export default function PrStatusModal({ status, onClose }) {
     const [processingId, setProcessingId] = useState(null)
 
     const isOopView = status === 'OOP'
+    const isCancelledPrView = status === 'CANCELLED_PR'
 
     useEffect(() => {
         fetchData()
@@ -20,7 +21,10 @@ export default function PrStatusModal({ status, onClose }) {
     async function fetchData() {
         setLoading(true)
         try {
-            const params = { per_page: 50, budget_status: status }
+            // CANCELLED_PR pakai filter status_ai, bukan budget_status
+            const params = isCancelledPrView
+                ? { per_page: 100, status_ai: 'CANCELLED' }
+                : { per_page: 50, budget_status: status }
             const res = await prPoDataApi.getAll(params)
             if (res.success) {
                 setPrList(res.data || [])
@@ -55,6 +59,7 @@ export default function PrStatusModal({ status, onClose }) {
         OVER_PLAN: 'OVER BUDGET (Melebihi Budget)',
         UNDER_PLAN: 'UNDER PLAN (Dibawah Budget)',
         OOP: 'OOP (Out of Plan)',
+        CANCELLED_PR: 'PR Dibatalkan Langsung',
     }[status] || status
 
     const handleExportPDF = () => {
@@ -132,6 +137,7 @@ export default function PrStatusModal({ status, onClose }) {
                                         <th className={s.right}>Nilai</th>
                                         <th className={s.center}>Kategori</th>
                                         {isOopView && <th className={s.center}>Aksi</th>}
+                                        {isCancelledPrView && <th>Alasan Pembatalan</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -151,6 +157,11 @@ export default function PrStatusModal({ status, onClose }) {
                                                     >
                                                         {processingId === pr.id ? '...' : '↩️ Batalkan'}
                                                     </button>
+                                                </td>
+                                            )}
+                                            {isCancelledPrView && (
+                                                <td style={{ fontSize: 12, color: '#64748b', maxWidth: 220, wordBreak: 'break-word' }}>
+                                                    {pr.alasan_pembatalan || '-'}
                                                 </td>
                                             )}
                                         </tr>

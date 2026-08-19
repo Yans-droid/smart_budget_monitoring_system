@@ -1,33 +1,33 @@
 .groupLabel {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.45);
-  background: transparent;
-  border: none;
-  padding: 8px 12px;
-  margin-top: 4px;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background 0.15s, color 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.45);
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    margin-top: 4px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
 }
 
 .groupLabel:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.04);
+    color: rgba(0, 0, 0, 0.65);
 }
 
 .groupLinks {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding-left: 6px;
-  margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 6px;
+    margin-top: 4px;
 }
 
 .sidebar {
@@ -157,7 +157,8 @@
     gap: 6px;
 }
 
-.pwdBtn, .logoutBtn {
+.pwdBtn,
+.logoutBtn {
     width: 100%;
     padding: 6px 0;
     border: 0.5px solid rgba(0, 0, 0, 0.12);

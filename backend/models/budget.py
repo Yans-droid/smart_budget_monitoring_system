@@ -10,7 +10,8 @@ class Budget(db.Model):
     )
     kategori_id = db.Column(
         db.BigInteger,
-        db.ForeignKey("kategori.id")
+        db.ForeignKey("kategori.id"),
+        index=True
     )
     periode =db.Column(
         db.String(30)

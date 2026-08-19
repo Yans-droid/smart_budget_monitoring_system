@@ -1,12 +1,13 @@
 from models.pr_po_data import PrPoData
 from models.planning_detail import PlanningDetail
 from utils.db import db
+from utils.sanitize import to_int_or_none
 
 class PlanningDetailService:
     @staticmethod
     def create_planning_detail(data):
-        planning_header_id = data.get("planning_header_id")
-        kategori_id = data.get("kategori_id")
+        planning_header_id = to_int_or_none(data.get("planning_header_id"))
+        kategori_id = to_int_or_none(data.get("kategori_id"))
         month = data.get("month")
         item = data.get("item")
         planning_amount = data.get("planning_amount")

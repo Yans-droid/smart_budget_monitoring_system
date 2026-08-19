@@ -8,6 +8,7 @@ from models.klasifikasi_log import KlasifikasiLog
 from models.planning_header import PlanningHeader
 from models.planning_detail import PlanningDetail
 from models.item_mapping import ItemMapping
+from models.mapping_log import MappingLog
 
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "PlanningHeader",
     "PlanningDetail",
     "ItemMapping",
+    "MappingLog",
 ]

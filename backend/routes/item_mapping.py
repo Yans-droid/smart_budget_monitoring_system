@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.mapping.item_mapping_service import ItemMappingService
+from utils.auth import role_required
 
 item_mapping_bp = Blueprint("item_mapping", __name__)
 
@@ -34,3 +35,9 @@ def update(mapping_id):
 def delete(mapping_id):
     result, status = ItemMappingService.delete(mapping_id)
     return jsonify(result), status
+
+
+@item_mapping_bp.route("/suggestions", methods=["GET"])
+def get_suggestions():
+    suggestions = ItemMappingService.suggest_new_rules()
+    return jsonify({"success": True, "data": suggestions}), 200

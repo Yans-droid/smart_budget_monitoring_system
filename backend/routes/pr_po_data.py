@@ -201,8 +201,12 @@ def approve(data_id):
     record.direview_at = datetime.utcnow()
     # Metode tetap dipertahankan (REGEX / SVM / RULE_BASE)
     # Hanya jika admin benar-benar ganti kategori lewat Simpan Perubahan -> barulah jadi MANUAL
-
+    
+    record.status_ai = "NEED_MAPPING"
     db.session.commit()
+
+    from services.mapping.advanced_mapping_service import AdvancedMappingService
+    AdvancedMappingService.run_mapping(record)
 
     return jsonify({
         "success": True,

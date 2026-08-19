@@ -143,7 +143,7 @@ export default function DetailModal({ type, periode, summaryItems, onClose }) {
                                 <table className={s.table}>
                                     <thead>
                                         <tr>
-                                            <th>Item</th>
+                                            <th>Transaksi-Form</th>
                                             <th className={s.center}>Kode</th>
                                             <th className={s.center}>Bulan</th>
                                             <th className={s.right}>Nilai</th>

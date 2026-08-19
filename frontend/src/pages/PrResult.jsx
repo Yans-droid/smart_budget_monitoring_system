@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import { prApi } from '../api/prApi'
 import { kategoriApi } from '../api/kategoriApi'
+import { useAuth } from '../context/AuthContext'
 import styles from './PrResult.module.css'
 
 const STATUS_CONFIG = {
-  PLANNING:  { bg: '#dcfce7', color: '#166534', label: 'PLANNING'  },
+  PLANNING: { bg: '#dcfce7', color: '#166534', label: 'PLANNING' },
   OVER_PLAN: { bg: '#fef9c3', color: '#854d0e', label: 'OVER BUDGET' },
-  OOP:       { bg: '#fee2e2', color: '#991b1b', label: 'OOP'       },
+  OOP: { bg: '#fee2e2', color: '#991b1b', label: 'OOP' },
+  CANCELLED: { bg: '#f1f5f9', color: '#64748b', label: 'DIBATALKAN' },
 }
 
 export default function PrResult() {
+  const { user } = useAuth()
   const [prList, setPrList] = useState([])
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
@@ -19,23 +22,28 @@ export default function PrResult() {
 
   // Filters
   const [filterKategori, setFilterKategori] = useState('')
-  const [filterUploadId, setFilterUploadId] = useState('')
+  const [searchItem, setSearchItem] = useState('')
+  const [filterStatus, setFilterStatus] = useState('DONE')
 
-  // Summary counts
-  const [counts, setCounts] = useState({ PLANNING: 0, OVER_PLAN: 0, OOP: 0 })
+  // Cancel modal state
+  const [cancelTarget, setCancelTarget] = useState(null)   // PR object yang akan dibatalkan
+  const [alasan, setAlasan] = useState('')
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState('')
 
   useEffect(() => {
-    kategoriApi.getAll().then(d => setKategoris(d.data || [])).catch(() => {})
+    kategoriApi.getAll().then(d => setKategoris(d.data || [])).catch(() => { })
   }, [])
 
-  useEffect(() => { fetchData() }, [page, filterKategori, filterUploadId])
+  useEffect(() => { fetchData() }, [page, filterKategori, searchItem, filterStatus])
 
   async function fetchData() {
     setLoading(true)
     try {
-      const params = { page, per_page: 50, status_ai: 'DONE' }
+      const params = { page, per_page: 50 }
+      if (filterStatus) params.filter_status = filterStatus
       if (filterKategori) params.kategori_id = filterKategori
-      if (filterUploadId) params.upload_id = parseInt(filterUploadId)
+      if (searchItem) params.search = searchItem
 
       const res = await prApi.getAll(params)
       const d = res.data
@@ -51,17 +59,50 @@ export default function PrResult() {
     return Number(n).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })
   }
 
-  function StatusBadge({ status }) {
-    const cfg = STATUS_CONFIG[status] || { bg: '#f1f5f9', color: '#64748b', label: status }
-    return (
-      <span style={{ background: cfg.bg, color: cfg.color, borderRadius: 4, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>
-        {cfg.label}
-      </span>
-    )
+  function StatusBadge({ pr }) {
+    if (pr.status_ai === 'CANCELLED') {
+      const cfg = STATUS_CONFIG.CANCELLED
+      return <span style={{ background: cfg.bg, color: cfg.color, borderRadius: 4, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>{cfg.label}</span>
+    }
+    if (pr.perlu_review) {
+      return <span className={styles.badgeReview}>PERLU REVIEW</span>
+    }
+    const key = pr.budget_status === 'ON_PLAN' ? 'PLANNING' : (pr.budget_status || pr.status_ai)
+    const cfg = STATUS_CONFIG[key] || { bg: '#f1f5f9', color: '#64748b', label: key }
+    return <span style={{ background: cfg.bg, color: cfg.color, borderRadius: 4, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>{cfg.label}</span>
   }
 
-  // Count per status from current page (approximation)
-  const planningCount = prList.filter(p => p.metode_klasifikasi === 'RULE_BASE' && p.status_ai === 'DONE').length
+  function openCancelModal(pr) {
+    setCancelTarget(pr)
+    setAlasan('')
+    setCancelError('')
+  }
+
+  function closeCancelModal() {
+    setCancelTarget(null)
+    setAlasan('')
+    setCancelError('')
+  }
+
+  async function confirmCancel() {
+    if (!cancelTarget) return
+    if (!alasan.trim()) { setCancelError('Alasan pembatalan wajib diisi'); return }
+    setCancelling(true)
+    setCancelError('')
+    try {
+      const res = await prApi.cancelPr(cancelTarget.id, user?.id, alasan.trim())
+      if (res.data?.success) {
+        closeCancelModal()
+        fetchData()
+      } else {
+        setCancelError(res.data?.message || 'Gagal membatalkan PR')
+      }
+    } catch (err) {
+      setCancelError(err.response?.data?.message || 'Gagal membatalkan PR')
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   return (
     <div className={styles.page}>
@@ -73,17 +114,26 @@ export default function PrResult() {
       {/* Filters */}
       <div className={styles.filters}>
         <input
-          placeholder="Upload ID"
-          value={filterUploadId}
-          onChange={e => { setFilterUploadId(e.target.value); setPage(1) }}
+          placeholder="Cari nama item..."
+          value={searchItem}
+          onChange={e => { setSearchItem(e.target.value); setPage(1) }}
           className={styles.input}
         />
+        <select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1) }} className={styles.input}>
+          <option value="">Semua Status</option>
+          <option value="DONE">Selesai / Approved</option>
+          <option value="PENDING">Perlu Review (Pending)</option>
+          <option value="ON_PLAN">Planning</option>
+          <option value="OVER_PLAN">Over Budget</option>
+          <option value="OOP">Out of Plan</option>
+          <option value="CANCELLED">Dibatalkan</option>
+        </select>
         <select value={filterKategori} onChange={e => { setFilterKategori(e.target.value); setPage(1) }} className={styles.input}>
           <option value="">Semua Kategori</option>
           {kategoris.map(k => <option key={k.id} value={k.id}>{k.kode} - {k.nama}</option>)}
         </select>
         <span className={styles.totalLabel}>
-          Total PR selesai: <strong>{total}</strong>
+          Total: <strong>{total}</strong>
         </span>
       </div>
 
@@ -94,19 +144,19 @@ export default function PrResult() {
             <table className={styles.table}>
               <thead>
                 <tr className={styles.tableHeader}>
-                  {['#', 'PR Doc', 'Description', 'Kategori', 'Supplier', 'Total Price', 'Metode', 'Status'].map(h => (
+                  {['#', 'PR Doc', 'Description', 'Kategori', 'Supplier', 'Total Price', 'Metode', 'Status', 'Aksi'].map(h => (
                     <th key={h} className={styles.th}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {prList.length === 0 && (
-                  <tr><td colSpan={8} className={styles.emptyState}>
+                  <tr><td colSpan={9} className={styles.emptyState}>
                     Belum ada hasil matching. Upload PR terlebih dahulu.
                   </td></tr>
                 )}
                 {prList.map((pr, i) => (
-                  <tr key={pr.id} className={styles.tr}>
+                  <tr key={pr.id} className={`${styles.tr} ${pr.status_ai === 'CANCELLED' ? styles.trCancelled : ''}`}>
                     <td className={styles.td}>{(page - 1) * 50 + i + 1}</td>
                     <td className={`${styles.td} ${styles.tdCode}`}>
                       {pr.pr_doc_num || '-'}
@@ -119,11 +169,24 @@ export default function PrResult() {
                     <td className={`${styles.td} ${styles.tdRight}`}>{fmt(pr.total_price)}</td>
                     <td className={`${styles.td} ${styles.tdMethod}`}>{pr.metode_klasifikasi || '-'}</td>
                     <td className={styles.td}>
-                      {/* Status ditentukan oleh matching engine / budget — tampilkan berdasarkan perlu_review */}
-                      {pr.perlu_review
-                        ? <span className={styles.badgeReview}>PERLU REVIEW</span>
-                        : <StatusBadge status={pr.budget_status === 'ON_PLAN' ? 'PLANNING' : (pr.budget_status || pr.status_ai)} />
-                      }
+                      <StatusBadge pr={pr} />
+                    </td>
+                    <td className={styles.td}>
+                      {pr.status_ai !== 'CANCELLED' &&
+                        !['PARTIAL_RECEIVED', 'GOODS_RECEIVED', 'COMPLETED'].includes(pr.procurement_status) && (
+                          <button
+                            className={styles.btnCancel}
+                            onClick={() => openCancelModal(pr)}
+                            title="Batalkan PR ini"
+                          >
+                            Batalkan
+                          </button>
+                        )}
+                      {pr.status_ai === 'CANCELLED' && (
+                        <span className={styles.cancelledNote} title={pr.alasan_pembatalan}>
+                          ✕ Dibatalkan
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -138,6 +201,46 @@ export default function PrResult() {
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className={styles.pgBtn}>Next ›</button>
           </div>
         </>
+      )}
+
+      {/* ── Modal Konfirmasi Pembatalan PR ── */}
+      {cancelTarget && (
+        <div className={styles.overlay} onClick={closeCancelModal}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>⚠ Batalkan PR</h3>
+            <p className={styles.modalDesc}>
+              Anda akan membatalkan PR berikut:
+            </p>
+            <div className={styles.modalPrInfo}>
+              <strong>{cancelTarget.pr_doc_num}</strong><br />
+              <span>{cancelTarget.description}</span>
+            </div>
+            <p className={styles.modalWarning}>
+              Tindakan ini tidak dapat diurungkan. PR yang dibatalkan akan dilepaskan dari Planning Detail dan tidak akan mempengaruhi perhitungan budget.
+            </p>
+            <label className={styles.modalLabel}>Alasan Pembatalan *</label>
+            <textarea
+              className={styles.modalTextarea}
+              rows={3}
+              placeholder="Contoh: Kebutuhan tidak relevan, sudah ada item sejenis di plan lain..."
+              value={alasan}
+              onChange={e => { setAlasan(e.target.value); setCancelError('') }}
+            />
+            {cancelError && <p className={styles.modalError}>{cancelError}</p>}
+            <div className={styles.modalActions}>
+              <button
+                className={styles.btnCancelConfirm}
+                onClick={confirmCancel}
+                disabled={cancelling}
+              >
+                {cancelling ? 'Memproses...' : 'Ya, Batalkan PR'}
+              </button>
+              <button className={styles.btnModalClose} onClick={closeCancelModal} disabled={cancelling}>
+                Tidak, Kembali
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

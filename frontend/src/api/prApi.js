@@ -1,12 +1,14 @@
 import api from './api'
 
 export const prApi = {
+
   // Upload Excel PR + jalankan matching
   upload: (formData) =>
     api.post('/pr/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 120000,
     }),
+
 
   // List PR dengan filter
   getAll: (params = {}) =>
@@ -39,4 +41,8 @@ export const prApi = {
   // Retry Mapping Only (Untuk NEED_MAPPING)
   retryMapping: (periode) =>
     api.post(`/pr/retry_mapping`, { periode }),
+
+  // Batalkan PR langsung (bukan cancel Planning)
+  cancelPr: (id, userId, alasan = '') =>
+    api.post(`/pr/${id}/cancel`, { user_id: userId, alasan }),
 }

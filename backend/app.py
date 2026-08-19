@@ -6,6 +6,7 @@ from sqlalchemy import text
 
 from config import Config
 from utils.db import db
+from flask_migrate import Migrate
 from utils.logger import setup_logger
 
 # Import semua model agar SQLAlchemy mengenali relasi
@@ -35,6 +36,7 @@ CORS(app)
 
 # Init database
 db.init_app(app)
+migrate = Migrate(app, db)  
 
 # --- Register Blueprints ---
 

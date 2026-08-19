@@ -260,8 +260,12 @@ class PrPoDataService:
         # Update juga kategori utama ke hasil koreksi
         record.kategori_id = kategori_id_koreksi
         record.metode_klasifikasi = "MANUAL"
+        record.status_ai = "NEED_MAPPING"
 
         db.session.commit()
+
+        from services.mapping.advanced_mapping_service import AdvancedMappingService
+        AdvancedMappingService.run_mapping(record)
 
         return {
             "success": True,

@@ -119,7 +119,8 @@ class PrPoData(db.Model):
             "PROCESSING",
             "DONE",
             "FAILED",
-            "NEED_MAPPING"
+            "NEED_MAPPING",
+            "CANCELLED"       # PR dibatalkan admin — tidak akan diproses ulang
         ),
         default="WAITING"
     )
@@ -192,6 +193,23 @@ class PrPoData(db.Model):
         onupdate=db.func.current_timestamp()
     )
 
+    # Kolom audit pembatalan PR langsung (berbeda dari cancel_planning_detail)
+    dibatalkan_oleh = db.Column(
+        db.BigInteger,
+        db.ForeignKey("users.id"),
+        nullable=True
+    )
+
+    dibatalkan_at = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+    alasan_pembatalan = db.Column(
+        db.Text,
+        nullable=True
+    )
+
     # --- Relationships ---
 
     upload_history = db.relationship(
@@ -222,9 +240,17 @@ class PrPoData(db.Model):
     )
 
     reviewer = db.relationship(
-        "User",
-        backref="reviewed_pr_po"
+    "User",
+    foreign_keys=[direview_oleh],
+    backref="reviewed_pr_po"
     )
+    dibatalkan_oleh_user = db.relationship(
+    "User",
+    foreign_keys=[dibatalkan_oleh],
+    backref="cancelled_pr_po"
+)
+  
+    
 
     @property
     def tracking_stage(self):
@@ -309,6 +335,12 @@ class PrPoData(db.Model):
                 self.updated_at.isoformat()
                 if self.updated_at else None
             ),
+            "dibatalkan_oleh": self.dibatalkan_oleh,
+            "dibatalkan_at": (
+                self.dibatalkan_at.isoformat()
+                if self.dibatalkan_at else None
+            ),
+            "alasan_pembatalan": self.alasan_pembatalan,
             "tracking_stage": self.tracking_stage,
         }
 

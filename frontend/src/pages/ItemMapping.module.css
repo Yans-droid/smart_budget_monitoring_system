@@ -20,7 +20,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +72,9 @@
   padding: 8px 16px;
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.15s;
 }
+.btnPrimary:hover { background: #1d4ed8; }
 
 .btnCancel {
   background: #6b7280;
@@ -82,7 +84,36 @@
   padding: 8px 16px;
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.15s;
 }
+.btnCancel:hover { background: #4b5563; }
+
+/* Varian kecil — dipakai di suggestion row */
+.btnPrimarySm {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnPrimarySm:hover { background: #1d4ed8; }
+
+.btnCancelSm {
+  background: #e5e7eb;
+  color: #374151;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnCancelSm:hover { background: #d1d5db; }
 
 .btnEdit {
   background: #f59e0b;
@@ -93,7 +124,9 @@
   font-size: 12px;
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.15s;
 }
+.btnEdit:hover { background: #d97706; }
 
 .btnDelete {
   background: #ef4444;
@@ -104,7 +137,9 @@
   font-size: 12px;
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.15s;
 }
+.btnDelete:hover { background: #dc2626; }
 
 .actionRow {
   display: flex;
@@ -118,7 +153,7 @@
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .tableHeader {
@@ -162,4 +197,37 @@
   text-align: center;
   padding: 20px;
   color: #888;
+}
+
+.suggestionPanel {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.suggestionTitle {
+  margin: 0 0 12px 0;
+  font-size: 15px;
+  color: #1e3a8a;
+}
+
+.suggestionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #dbeafe;
+  font-size: 13px;
+}
+
+.suggestionRow:last-child {
+  border-bottom: none;
+}
+
+.suggestionActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }

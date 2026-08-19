@@ -1,5 +1,11 @@
+from models.pr_po_data import PrPoData
 from models.item_mapping import ItemMapping
 from utils.db import db
+from utils.sanitize import to_int_or_none
+from datetime import datetime, timedelta
+from sqlalchemy import func
+from models.mapping_log import MappingLog
+from models.planning_detail import PlanningDetail
 
 
 class ItemMappingService:
@@ -25,7 +31,8 @@ class ItemMappingService:
     def create(data):
         keyword = data.get("keyword")
         planning_item = data.get("planning_item")
-        kategori_id = data.get("kategori_id")
+        # Konversi empty string ke None — form React kirim '' kalau tidak dipilih
+        kategori_id = to_int_or_none(data.get("kategori_id"))
         priority = data.get("priority", 1)
 
         if not keyword:
@@ -38,11 +45,15 @@ class ItemMappingService:
             planning_item=planning_item,
             kategori_id=kategori_id,
             priority=priority,
-            is_active=True
+            is_active=data.get("is_active", True)
         )
 
-        db.session.add(mapping)
-        db.session.commit()
+        try:
+            db.session.add(mapping)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return {"success": False, "message": f"Gagal menyimpan: {str(e)}"}, 500
 
         return {
             "success": True,
@@ -61,13 +72,18 @@ class ItemMappingService:
         if "planning_item" in data:
             mapping.planning_item = data["planning_item"]
         if "kategori_id" in data:
-            mapping.kategori_id = data["kategori_id"]
+            # Sanitasi: konversi empty string ke None
+            mapping.kategori_id = to_int_or_none(data["kategori_id"])
         if "priority" in data:
             mapping.priority = data["priority"]
         if "is_active" in data:
             mapping.is_active = data["is_active"]
 
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return {"success": False, "message": f"Gagal update: {str(e)}"}, 500
 
         return {
             "success": True,
@@ -109,3 +125,46 @@ class ItemMappingService:
             return None
 
         return result.planning_item
+
+    @staticmethod
+    def suggest_new_rules(min_occurrence=3, months_back=12):
+        """
+        Cari pola dari mapping_log: description yang sama persis,
+        dipetakan ke planning_detail_id yang sama, berulang >= min_occurrence kali,
+        dalam `months_back` bulan terakhir. Cuma menyarankan, TIDAK auto-insert
+        ke item_mapping.
+        """
+        cutoff_date = datetime.utcnow() - timedelta(days=months_back * 30)
+
+        results = db.session.query(
+            PrPoData.description,
+            MappingLog.planning_detail_hasil_id,
+            func.count(MappingLog.id).label('jumlah')
+        ).join(
+            MappingLog, MappingLog.pr_po_data_id == PrPoData.id
+        ).filter(
+            MappingLog.is_selected == True,
+            MappingLog.planning_detail_hasil_id.isnot(None),  # otomatis exclude OOP (poin 4)
+            MappingLog.created_at >= cutoff_date               # exclude data lama (poin 2)
+        ).group_by(
+            PrPoData.description, MappingLog.planning_detail_hasil_id
+        ).having(
+            func.count(MappingLog.id) >= min_occurrence
+        ).order_by(
+            func.count(MappingLog.id).desc()                    # urutkan by jumlah (poin 3)
+        ).all()
+
+        suggestions = []
+        for desc, detail_id, jumlah in results:
+            # Skip kalau rule untuk keyword ini SUDAH ada (aktif ATAU sudah di-dismiss)
+            existing_rule = ItemMapping.query.filter_by(keyword=desc).first()
+            if existing_rule:
+                continue
+            detail = db.session.get(PlanningDetail, detail_id)
+            suggestions.append({
+                "description": desc,
+                "planning_detail_id": detail_id,
+                "planning_item": detail.item if detail else None,
+                "jumlah_kemunculan": jumlah
+            })
+        return suggestions

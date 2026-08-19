@@ -2,6 +2,7 @@ from datetime import datetime
 from models.planning_header import PlanningHeader
 from models.planning_detail import PlanningDetail
 from utils.db import db
+from utils.sanitize import to_int_or_none
 
 
 class PlanningServices:
@@ -51,8 +52,8 @@ class PlanningServices:
     @staticmethod
     def create_planning_detail(data):
 
-        planning_header_id= data.get("planning_header_id")
-        kategori_id = data.get("kategori_id")
+        planning_header_id = to_int_or_none(data.get("planning_header_id"))
+        kategori_id = to_int_or_none(data.get("kategori_id"))
         item = data.get("item")
         planning_amount = data.get("planning_amount")
         remarks = data.get("remarks")

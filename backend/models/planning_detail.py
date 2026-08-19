@@ -5,11 +5,11 @@ class PlanningDetail(db.Model):
     __tablename__ = "planning_detail"
 
     id = db.Column(
-        db.Integer,
+        db.BigInteger,
         primary_key=True
     )
     planning_header_id = db.Column(
-        db.Integer,
+        db.BigInteger,
         db.ForeignKey("planning_header.id"),
         nullable=False
     )
@@ -35,7 +35,7 @@ class PlanningDetail(db.Model):
         db.String(255)
     )
     status_realisasi = db.Column(
-        db.Enum('OPEN', 'PROSES', 'CLOSED', 'CANCELLED','CANCELLED'),
+        db.Enum('OPEN', 'PROSES', 'CLOSED', 'CANCELLED'),
         nullable=False,
         default='OPEN',
         comment="Agregat status realisasi dari semua PR yang di-mapping ke item ini"

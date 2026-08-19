@@ -101,59 +101,64 @@ class PipelineService:
     @staticmethod
     def get_dashboard_summary(periode: str):
         """
-        Mengambil summary untuk Dashboard Sprint 6.
+        Mengambil summary untuk Dashboard — semua metrik di-scope per periode (tahun).
+        Filter utama: extract(year, PrPoData.request_date) == periode
+        untuk PR yang belum matched (OOP/NEED_MAPPING), dan
+        join PlanningHeader.periode untuk metrik berbasis planning.
         """
-        from sqlalchemy import func
+        year = int(periode)
 
-        # 1. Planning Active (SUCCES)
+        # Filter base: PR berdasarkan tahun request_date
+        year_filter = extract('year', PrPoData.request_date) == year
+
+        # 1. Planning Active (SUCCES) — sudah filter periode
         planning_active = db.session.query(func.count(PlanningHeader.id)).filter(
             PlanningHeader.periode == periode,
             PlanningHeader.status == "SUCCES"
         ).scalar() or 0
 
-        # Base query for PR
-        pr_query = db.session.query(PrPoData).join(
-            PlanningDetail, PrPoData.planning_detail_id == PlanningDetail.id, isouter=True
-        ).join(
-            PlanningHeader, PlanningDetail.planning_header_id == PlanningHeader.id, isouter=True
-        )
-
-        # 2. Total PR (semua upload) 
-        # Kita hitung dari PrPoData, idealnya filter by periode, tapi PrPoData tidak punya periode
-        # kecuali dari PlanningHeader ATAU kita ambil dari request_date.
-        # Sementara kita ambil semua PR atau filter berdasarkan pr_po_data yang diupload dengan periode (upload_history)
-        # Untuk simple, hitung semua jika tidak difilter ketat
-        total_pr = db.session.query(func.count(PrPoData.id)).scalar() or 0
-
-        # 3. Total Matched
-        total_matched = db.session.query(func.count(PrPoData.id)).filter(
-            PrPoData.planning_detail_id.isnot(None)
+        # 2. Total PR di periode ini (berdasarkan request_date)
+        total_pr = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter
         ).scalar() or 0
 
-        # 4. Need Mapping
+        # 3. Total Matched — PR yang sudah punya planning_detail DAN planning-nya di periode ini
+        total_matched = db.session.query(func.count(PrPoData.id)).join(
+            PlanningDetail, PrPoData.planning_detail_id == PlanningDetail.id
+        ).join(
+            PlanningHeader, PlanningDetail.planning_header_id == PlanningHeader.id
+        ).filter(
+            PlanningHeader.periode == periode
+        ).scalar() or 0
+
+        # 4. Need Mapping — PR di periode ini yang belum bisa di-mapping
         need_mapping = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
             PrPoData.status_ai == "NEED_MAPPING"
         ).scalar() or 0
 
-        # 5. Budget Status
+        # 5. Budget Status — di-scope ke periode via request_date
         on_plan = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
             PrPoData.budget_status == "ON_PLAN"
         ).scalar() or 0
-        
+
         over_plan = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
             PrPoData.budget_status == "OVER_PLAN"
         ).scalar() or 0
-        
+
         under_plan = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
             PrPoData.budget_status == "UNDER_PLAN"
         ).scalar() or 0
-        
+
         oop = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
             PrPoData.budget_status == "OOP"
         ).scalar() or 0
 
-        # 6. Remaining Budget (Total Planning Amount - Used Amount)
-        # Mengukur sisa serapan dari dokumen perencanaan yang aktif
+        # 6. Remaining Budget — Total Planning Amount (periode) dikurangi total used
         total_planning_amount = db.session.query(func.sum(PlanningDetail.planning_amount)).join(
             PlanningHeader, PlanningDetail.planning_header_id == PlanningHeader.id
         ).filter(
@@ -163,30 +168,34 @@ class PipelineService:
         ).scalar() or 0
 
         total_used_amount = db.session.query(func.sum(PrPoData.total_price)).filter(
+            year_filter,
             PrPoData.budget_status.in_(["ON_PLAN", "OVER_PLAN"])
         ).scalar() or 0
 
         remaining_budget = total_planning_amount - total_used_amount
 
-        # 7. Tracking Stage counts — mutually exclusive (tidak tumpang tindih)
-        # PR Stage: ada PR, belum ada PO (masih menunggu PO dibuat)
+        # 7. Tracking Stage — di-scope ke periode via request_date
+        # PR Stage: ada PR, belum ada PO
         pr_stage = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
             PrPoData.pr_doc_num.isnot(None),
-            PrPoData.po_doc_num.is_(None)   # belum ada PO sama sekali
+            PrPoData.po_doc_num.is_(None)
         ).scalar() or 0
 
-        # PO Stage: sudah ada PO, belum ada GR (masih menunggu barang datang)
+        # PO Stage: sudah ada PO, belum ada GR
         po_stage = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
             PrPoData.po_doc_num.isnot(None),
-            PrPoData.gr_legal_number.is_(None)  # belum ada GR
+            PrPoData.gr_legal_number.is_(None)
         ).scalar() or 0
 
-        # GR Stage: sudah ada GR (proses selesai/barang diterima)
+        # GR Stage: sudah ada GR
         gr_stage = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
             PrPoData.gr_legal_number.isnot(None)
         ).scalar() or 0
 
-        # 8. Cancelled Planning (count and amount)
+        # 8. Cancelled Planning — sudah filter periode via PlanningHeader
         cancelled_items = db.session.query(
             func.count(PlanningDetail.id),
             func.sum(PlanningDetail.planning_amount)
@@ -199,6 +208,12 @@ class PipelineService:
 
         cancelled_count = cancelled_items[0] or 0
         cancelled_amount = float(cancelled_items[1] or 0)
+
+        # 9. PR Cancelled langsung — status_ai == CANCELLED, di-scope ke periode via request_date
+        cancelled_pr_count = db.session.query(func.count(PrPoData.id)).filter(
+            year_filter,
+            PrPoData.status_ai == "CANCELLED"
+        ).scalar() or 0
 
         return {
             "success": True,
@@ -216,9 +231,11 @@ class PipelineService:
                 "po_stage": po_stage,
                 "gr_stage": gr_stage,
                 "cancelled_count": cancelled_count,
-                "cancelled_amount": cancelled_amount
+                "cancelled_amount": cancelled_amount,
+                "cancelled_pr_count": cancelled_pr_count
             }
         }
+
     @staticmethod
     def get_dashboard_summary_monthly(periode: str):
         """

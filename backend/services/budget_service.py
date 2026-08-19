@@ -6,6 +6,7 @@ from models.budget import Budget
 from models.kategori import Kategori
 from models.pr_po_data import PrPoData
 from utils.db import db
+from utils.sanitize import to_int_or_none
 
 
 class BudgetService:
@@ -25,11 +26,11 @@ class BudgetService:
 
     @staticmethod
     def create_budget(data):
-        kategori_id = data.get("kategori_id")
+        kategori_id = to_int_or_none(data.get("kategori_id"))
         periode = data.get("periode")
         nominal = data.get("nominal")
-        created_by = data.get("created_by")
-        upload_id = data.get("upload_id")
+        created_by = to_int_or_none(data.get("created_by"))
+        upload_id = to_int_or_none(data.get("upload_id"))
 
         if not kategori_id:
             return {
@@ -105,13 +106,19 @@ class BudgetService:
             budget.periode = data["periode"]
 
         if "kategori_id" in data:
-            kategori = db.session.get(Kategori, data["kategori_id"])
+            kat_id = to_int_or_none(data["kategori_id"])
+            if not kat_id:
+                return {
+                    "success": False,
+                    "message": "kategori_id tidak valid"
+                }, 400
+            kategori = db.session.get(Kategori, kat_id)
             if not kategori:
                 return {
                     "success": False,
                     "message": "Kategori tidak ditemukan"
                 }, 404
-            budget.kategori_id = data["kategori_id"]
+            budget.kategori_id = kat_id
 
         db.session.commit()
 

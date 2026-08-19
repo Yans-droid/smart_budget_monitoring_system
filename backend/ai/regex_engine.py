@@ -1,25 +1,4 @@
 import re
-
-CAPEX_RULES = [
-    r"\bNEW\s+MACHINE\b",
-    r"\bNEW\s+EQUIPMENT\b",
-    r"\bINVESTMENT\b",
-    r"\bINSTALLATION\b",
-    r"\bPURCHASE\b",
-    r"\bPROJECT\b",
-    r"\bASSET\b",
-]
-
-OPEX_RULES = [
-    r"\bMAINTENANCE\b",
-    r"\bREPAIR\b",
-    r"\bSPARE\s+PARTS?\b",
-    r"\bCONSUMABLE\b",
-    r"\bSERVICE\b",
-  
-]
-
-
 INVENTORY_KEYWORDS = [
     r"\bKUNCI\s+L\b",
     r"\bKUNCI\s+SHOCK\b",
@@ -55,16 +34,3 @@ def regex_predict(text):
                 return "I-1"
 
     return None
-
-def detect_budget_type(text):
-    text_up = text.upper()
-
-    capex_score = sum(1 for r in CAPEX_RULES if re.search(r, text_up))
-    opex_score  = sum(1 for r in OPEX_RULES  if re.search(r, text_up))
-
-    if capex_score > opex_score:
-        return "CAPEX"
-    if opex_score > capex_score:
-        return "OPEX"
-
-    return None  # skor sama atau 0 → lanjut ke ML

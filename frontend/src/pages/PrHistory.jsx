@@ -13,16 +13,18 @@ export default function PrHistory() {
   
   const [page, setPage] = useState(1)
   const [filterStatus, setFilterStatus] = useState('')
+  const [trackingStage, setTrackingStage] = useState('')
   const [uploadId, setUploadId] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const CURRENT_YEAR = String(new Date().getFullYear())
 
   // Fetch Data Query
   const { data: listData, isLoading: loading, refetch } = useQuery({
-    queryKey: ['prHistory', page, filterStatus, uploadId],
+    queryKey: ['prHistory', page, filterStatus, trackingStage, uploadId],
     queryFn: async () => {
       const params = { page, per_page: 30 }
       if (filterStatus) params.status_ai = filterStatus
+      if (trackingStage) params.tracking_stage = trackingStage
       if (uploadId) params.upload_id = parseInt(uploadId)
       const res = await prApi.getAll(params)
       return res.data
@@ -160,6 +162,12 @@ export default function PrHistory() {
           <option value="PROCESSING">PROCESSING</option>
           <option value="DONE">DONE</option>
           <option value="FAILED">FAILED</option>
+        </select>
+        <select value={trackingStage} onChange={e => { setTrackingStage(e.target.value); setPage(1) }} className={styles.input}>
+          <option value="">Semua Tahapan</option>
+          <option value="PR">PR</option>
+          <option value="PO">PO</option>
+          <option value="GR">GR</option>
         </select>
         {uploadId && user?.role === 'admin' && (
           <button 

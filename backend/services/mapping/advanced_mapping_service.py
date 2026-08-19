@@ -94,10 +94,11 @@ class AdvancedMappingService:
 
         # 4. Kalau rule ketemu -> cari planning_detail persis (+ filter bulan)
         if matched_planning_item:
-            exact_detail = PlanningDetail.query.filter_by(
-                planning_header_id=header.id,
-                item=matched_planning_item,
-                month=month
+            exact_detail = PlanningDetail.query.filter(
+                PlanningDetail.planning_header_id == header.id,
+                PlanningDetail.item == matched_planning_item,
+                PlanningDetail.month == month,
+                PlanningDetail.status_realisasi != 'CANCELLED'
             ).first()
             print(f"DEBUG [PR#{pr.id}] exact_detail (rule) = {exact_detail}")
 
@@ -127,10 +128,11 @@ class AdvancedMappingService:
         MappingLog.query.filter_by(pr_po_data_id=pr.id, method="FUZZY_MATCH").delete()
 
         # 5. Fuzzy matching — Coba bulan yang sama dulu
-        candidates = PlanningDetail.query.filter_by(
-            planning_header_id=header.id,
-            kategori_id=pr.kategori_id,
-            month=month
+        candidates = PlanningDetail.query.filter(
+            PlanningDetail.planning_header_id == header.id,
+            PlanningDetail.kategori_id == pr.kategori_id,
+            PlanningDetail.month == month,
+            PlanningDetail.status_realisasi != 'CANCELLED'
         ).all()
 
         pr_reg_num = AdvancedMappingService.extract_code(description)
@@ -173,9 +175,10 @@ class AdvancedMappingService:
         # Cari di seluruh bulan tapi HILANGKAN DUPLIKAT NAMA
         if not final_results:
             cross_month = True
-            all_candidates = PlanningDetail.query.filter_by(
-                planning_header_id=header.id,
-                kategori_id=pr.kategori_id
+            all_candidates = PlanningDetail.query.filter(
+                PlanningDetail.planning_header_id == header.id,
+                PlanningDetail.kategori_id == pr.kategori_id,
+                PlanningDetail.status_realisasi != 'CANCELLED'
             ).all()
 
             unique_choices = {}

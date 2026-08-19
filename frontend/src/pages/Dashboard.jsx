@@ -3,6 +3,7 @@ import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import s from './Dashboard.module.css'
 import AlertBanner from '../components/AlertBanner'
+import Tabs from '../components/Tabs'
 import MetricCard from '../components/MetricCard'
 import BudgetCard from '../components/BudgetCard'
 import FormTable from '../components/FormTable'
@@ -13,13 +14,13 @@ import PrStatusModal from '../components/PrStatusModal'
 import PrTrackingModal from '../components/PrTrackingModal'
 import MonthlyPipelineChart from '../components/MonthlyPipelineChart'
 import CancelledPlanningModal from '../components/CancelledPlanningModal'
+import PeriodeSwitcher from '../components/SwitchComponent'
 import { budgetApi } from '../api/budgetApi'
 import { prApi } from '../api/prApi'
 import { formatRp } from '../utils/format'
 
-const CURRENT_YEAR = String(new Date().getFullYear())
-
 export default function Dashboard() {
+  const [periode, setPeriode] = useState(String(new Date().getFullYear()))
   const [selectedForm, setSelectedForm] = useState(null)
   const [summary, setSummary] = useState(null)
   const [prSummary, setPrSummary] = useState(null)
@@ -44,7 +45,7 @@ export default function Dashboard() {
       const contentHeight = (canvas.height * contentWidth) / canvas.width
 
       pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, contentHeight)
-      pdf.save(`dashboard_report_${CURRENT_YEAR}.pdf`)
+      pdf.save(`dashboard_report_${periode}.pdf`)
     } catch (error) {
       console.error('Error exporting PDF:', error)
     } finally {
@@ -54,16 +55,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchSummary()
-  }, [])
+  }, [periode])
 
-  async function fetchSummary() {
-    setLoading(true)
+  async function fetchSummary(showLoading = true) {
+    if (showLoading) setLoading(true)
     setError('')
     try {
       const [resBudget, resPr, resMonthly] = await Promise.all([
-        budgetApi.getSummary(CURRENT_YEAR),
-        prApi.getDashboardSummary(CURRENT_YEAR),
-        prApi.getDashboardSummaryMonthly(CURRENT_YEAR)
+        budgetApi.getSummary(periode),
+        prApi.getDashboardSummary(periode),
+        prApi.getDashboardSummaryMonthly(periode)
       ])
 
       if (resBudget.success) {
@@ -82,7 +83,7 @@ export default function Dashboard() {
     } catch (err) {
       setError(err.response?.data?.message || 'Gagal memuat data dashboard')
     } finally {
-      setLoading(false)
+      if (showLoading) setLoading(false)
     }
   }
 
@@ -108,7 +109,7 @@ export default function Dashboard() {
         <div className={s.header}>
           <div className={s.headerLeft}>
             <h1>Dashboard</h1>
-            <p>Monitoring budget {CURRENT_YEAR}</p>
+            <p>Monitoring budget {periode}</p>
           </div>
         </div>
         <div style={{ textAlign: 'center', padding: 60, color: '#e85d3a' }}>
@@ -169,136 +170,128 @@ export default function Dashboard() {
     ? `${overItems.join(', ')} perlu perhatian`
     : 'Semua dalam batas'
 
-  return (
-    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>Dashboard</h1>
-          <p style={{ color: 'var(--text2)', fontSize: '0.9375rem' }}>Monitoring budget & PR Pipeline {CURRENT_YEAR}</p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '0.875rem', color: 'var(--text2)', background: 'var(--bg2)', padding: '8px 16px', borderRadius: '8px', border: '0.5px solid var(--border)' }}>
-            Jan — Des {CURRENT_YEAR}
-          </span>
-          <button
-            className="btn-primary"
-            onClick={handleExportAll}
-            disabled={isExporting}
-            style={{ padding: '9px 16px', background: 'var(--text)', fontSize: '0.875rem' }}
-          >
-            {isExporting ? 'Exporting...' : '⬇ Export PDF'}
-          </button>
-        </div>
-      </div>
+  const dashboardTabs = [
+    {
+      id: 'overview',
+      label: 'Ringkasan Utama',
+      content: (
+        <>
+          {/* BUDGET OVERVIEW SECTION */}
+          <section className="card" style={{ padding: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1.25rem', letterSpacing: '-0.01em' }}>Budget Overview</h2>
+            <div className={s.metricGrid}>
+              <MetricCard
+                label="Total budget"
+                value={formatRp(totalBudget)}
+                sub="CAPEX + OPEX"
+              />
+              <MetricCard
+                label="Terpakai"
+                value={formatRp(totalActual)}
+                sub={totalBudget > 0 ? `${Math.round((totalActual / totalBudget) * 100)}% dari total` : '—'}
+                variant="danger"
+              />
+              <MetricCard
+                label="Saldo"
+                value={formatRp(totalSaldo)}
+                sub={totalBudget > 0 ? `${Math.round((totalSaldo / totalBudget) * 100)}% dari total` : '—'}
+                variant="success"
+              />
+              <MetricCard
+                label="Over budget"
+                value={`${overCount} form`}
+                sub={overSubText}
+                variant={overCount > 0 ? 'warning' : 'default'}
+              />
+            </div>
+          </section>
 
-      {alerts.length > 0 && <AlertBanner alerts={alerts} />}
+          {/* PR PIPELINE SECTION */}
+          <section className="card" style={{ padding: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1.25rem', letterSpacing: '-0.01em' }}>PR Pipeline Status</h2>
+            <div className={s.metricGrid}>
+              <MetricCard
+                label="Planning Active"
+                value={prSummary?.planning_active || 0}
+                sub="Form Planning"
+                variant="info"
+              />
+              <MetricCard
+                label="Total PR"
+                value={prSummary?.total_pr || 0}
+                sub="Data Uploaded"
+                variant="yellow"
+              />
+              <MetricCard
+                label="Total Matched"
+                value={prSummary?.total_matched || 0}
+                sub="Ke Planning Detail"
+                variant="success"
+              />
+              <MetricCard
+                label="Need Mapping"
+                value={prSummary?.need_mapping || 0}
+                sub="Belum di-mapping"
+                variant="purple"
+              />
 
-      <div ref={dashboardRef} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-
-        {/* BUDGET OVERVIEW SECTION */}
-        <section className="card" style={{ padding: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1.25rem', letterSpacing: '-0.01em' }}>Budget Overview</h2>
-          <div className={s.metricGrid}>
-            <MetricCard
-              label="Total budget"
-              value={formatRp(totalBudget)}
-              sub="CAPEX + OPEX"
-            />
-            <MetricCard
-              label="Terpakai"
-              value={formatRp(totalActual)}
-              sub={totalBudget > 0 ? `${Math.round((totalActual / totalBudget) * 100)}% dari total` : '—'}
-              variant="danger"
-            />
-            <MetricCard
-              label="Saldo"
-              value={formatRp(totalSaldo)}
-              sub={totalBudget > 0 ? `${Math.round((totalSaldo / totalBudget) * 100)}% dari total` : '—'}
-              variant="success"
-            />
-            <MetricCard
-              label="Over budget"
-              value={`${overCount} form`}
-              sub={overSubText}
-              variant={overCount > 0 ? 'warning' : 'default'}
-            />
-          </div>
-        </section>
-
-        {/* PR PIPELINE SECTION */}
-        <section className="card" style={{ padding: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1.25rem', letterSpacing: '-0.01em' }}>PR Pipeline Status</h2>
-          <div className={s.metricGrid}>
-            <MetricCard
-              label="Planning Active"
-              value={prSummary?.planning_active || 0}
-              sub="Form Planning"
-              variant="info"
-            />
-            <MetricCard
-              label="Total PR"
-              value={prSummary?.total_pr || 0}
-              sub="Data Uploaded"
-              variant="yellow"
-            />
-            <MetricCard
-              label="Total Matched"
-              value={prSummary?.total_matched || 0}
-              sub="Ke Planning Detail"
-              variant="success"
-            />
-            <MetricCard
-              label="Need Mapping"
-              value={prSummary?.need_mapping || 0}
-              sub="Belum di-mapping"
-              variant="purple"
-            />
-
-            <MetricCard
-              label="ON PLAN"
-              value={prSummary?.on_plan || 0}
-              sub="Dalam Budget"
-              variant="success"
-              onClick={() => setSelectedForm('ON_PLAN')}
-            />
-            <MetricCard
-              label="OVER BUDGET"
-              value={prSummary?.over_plan || 0}
-              sub="Melebihi Budget"
-              variant="warning"
-              onClick={() => setSelectedForm('OVER_PLAN')}
-            />
-            <MetricCard
-              label="UNDER PLAN"
-              value={prSummary?.under_plan || 0}
-              sub="Dibawah Budget"
-              variant="info"
-              onClick={() => setSelectedForm('UNDER_PLAN')}
-            />
-            <MetricCard
-              label="OOP"
-              value={prSummary?.oop || 0}
-              sub="Out of Plan"
-              variant="danger"
-              onClick={() => setSelectedForm('OOP')}
-            />
-            <MetricCard
-              label="Remaining Budget"
-              value={formatRp(prSummary?.remaining_budget || 0)}
-              sub="Total Plan - Used"
-              variant={(prSummary?.remaining_budget || 0) < 0 ? 'danger' : 'success'}
-            />
-            <MetricCard
-              label="Dibatalkan"
-              value={prSummary?.cancelled_count || 0}
-              sub={`${formatRp(prSummary?.cancelled_amount || 0)}`}
-              variant="danger"
-              onClick={() => setShowCancelledPlanningModal(true)}
-            />
-          </div>
-        </section>
-
-        {/* TRACKING STAGE SECTION */}
+              <MetricCard
+                label="ON PLAN"
+                value={prSummary?.on_plan || 0}
+                sub="Dalam Budget"
+                variant="success"
+                onClick={() => setSelectedForm('ON_PLAN')}
+              />
+              <MetricCard
+                label="OVER BUDGET"
+                value={prSummary?.over_plan || 0}
+                sub="Melebihi Budget"
+                variant="warning"
+                onClick={() => setSelectedForm('OVER_PLAN')}
+              />
+              <MetricCard
+                label="UNDER PLAN"
+                value={prSummary?.under_plan || 0}
+                sub="Dibawah Budget"
+                variant="info"
+                onClick={() => setSelectedForm('UNDER_PLAN')}
+              />
+              <MetricCard
+                label="OOP"
+                value={prSummary?.oop || 0}
+                sub="Out of Plan"
+                variant="danger"
+                onClick={() => setSelectedForm('OOP')}
+              />
+              <MetricCard
+                label="Remaining Budget"
+                value={formatRp(prSummary?.remaining_budget || 0)}
+                sub="Total Plan - Used"
+                variant={(prSummary?.remaining_budget || 0) < 0 ? 'danger' : 'success'}
+              />
+              <MetricCard
+                label="Plan Cancelled"
+                value={prSummary?.cancelled_count || 0}
+                sub={`${formatRp(prSummary?.cancelled_amount || 0)}`}
+                variant="danger"
+                onClick={() => setShowCancelledPlanningModal(true)}
+              />
+              <MetricCard
+                label="PR Cancelled"
+                value={prSummary?.cancelled_pr_count || 0}
+                sub="Dibatalkan langsung"
+                variant="default"
+                onClick={() => setSelectedForm('CANCELLED_PR')}
+              />
+            </div>
+          </section>
+        </>
+      )
+    },
+    {
+      id: 'tracking',
+      label: 'Tracking Dokumen',
+      content: (
         <section className="card" style={{ padding: '1.5rem' }}>
           <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1.25rem', letterSpacing: '-0.01em' }}>Document Tracking Stage</h2>
           <div className={s.metricGrid}>
@@ -325,14 +318,16 @@ export default function Dashboard() {
             />
           </div>
 
-
-          {/* Monthly Breakdown Chart */}
           <div style={{ marginTop: '1.5rem' }}>
             <MonthlyPipelineChart title="Statistik PR per Bulan" data={monthlySummary} />
           </div>
         </section>
-
-        {/* CAPEX VS OPEX SECTION */}
+      )
+    },
+    {
+      id: 'capex_opex',
+      label: 'Analisis CAPEX & OPEX',
+      content: (
         <section className="card" style={{ padding: '1.5rem', background: 'transparent', border: 'none' }}>
           <div className={s.budgetGrid}>
             <BudgetCard type="CAPEX" {...capex} onClick={() => setSelectedForm('CAPEX')} />
@@ -344,22 +339,59 @@ export default function Dashboard() {
             <BudgetChart title="Grafik per form" data={chartForm} />
           </div>
         </section>
-
-        {/* FORM TABLE SECTION */}
+      )
+    },
+    {
+      id: 'rincian',
+      label: 'Rincian Form',
+      content: (
         <section className="card" style={{ padding: '1.5rem' }}>
           <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1.25rem', letterSpacing: '-0.01em' }}>Rincian Form</h2>
           <FormTable data={budgetData} onRowClick={setSelectedForm} />
         </section>
+      )
+    }
+  ]
+
+  return (
+    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>Dashboard</h1>
+          <p style={{ color: 'var(--text2)', fontSize: '0.9375rem' }}>Monitoring budget & PR Pipeline {periode}</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <PeriodeSwitcher value={periode} onChange={setPeriode} />
+          <button
+            className="btn-primary"
+            onClick={handleExportAll}
+            disabled={isExporting}
+            style={{ padding: '9px 16px', background: 'var(--text)', fontSize: '0.875rem' }}
+          >
+            {isExporting ? 'Exporting...' : '⬇ Export PDF'}
+          </button>
+        </div>
+      </div>
+
+      {alerts.length > 0 && <AlertBanner alerts={alerts} />}
+
+      <div ref={dashboardRef} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <Tabs tabs={dashboardTabs} />
       </div>
 
       {selectedForm === 'ALL' ? (
         <AllMonthlyDetailModal
-          periode={CURRENT_YEAR}
+          periode={periode}
           onClose={() => setSelectedForm(null)}
         />
       ) : ['ON_PLAN', 'OVER_PLAN', 'UNDER_PLAN', 'OOP'].includes(selectedForm) ? (
         <PrStatusModal
           status={selectedForm}
+          onClose={() => setSelectedForm(null)}
+        />
+      ) : selectedForm === 'CANCELLED_PR' ? (
+        <PrStatusModal
+          status="CANCELLED_PR"
           onClose={() => setSelectedForm(null)}
         />
       ) : ['STAGE_PR', 'STAGE_PO', 'STAGE_GR'].includes(selectedForm) ? (
@@ -370,18 +402,18 @@ export default function Dashboard() {
       ) : selectedForm ? (
         <DetailModal
           type={selectedForm}
-          periode={CURRENT_YEAR}
+          periode={periode}
           summaryItems={items}
           onClose={() => {
             setSelectedForm(null)
-            fetchSummary()
+            fetchSummary(false)
           }}
         />
       ) : null}
       {showCancelledPlanningModal && (
         <CancelledPlanningModal
-          periode={CURRENT_YEAR}
-          onClose={() => { setShowCancelledPlanningModal(false); fetchSummary(); }}
+          periode={periode}
+          onClose={() => { setShowCancelledPlanningModal(false); fetchSummary(false); }}
         />
       )}
     </div>

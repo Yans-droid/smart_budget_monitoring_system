@@ -13,11 +13,40 @@ export default function ItemMapping() {
   const [showForm, setShowForm] = useState(false)
   const [editData, setEditData] = useState(null)
   const [form, setForm] = useState({ keyword: '', planning_item: '', kategori_id: '', priority: 1, is_active: true })
+  const [suggestions, setSuggestions] = useState([])
+  // keyword saran yang sedang diproses lewat form (agar bisa dihapus dari list setelah simpan)
+  const [appliedKeyword, setAppliedKeyword] = useState(null)
 
   useEffect(() => { fetchAll() }, [])
   useEffect(() => {
-    kategoriApi.getAll().then(d => setKategoris(d.data || [])).catch(() => {})
+    kategoriApi.getAll().then(d => setKategoris(d.data || [])).catch(() => { })
   }, [])
+  useEffect(() => {
+    itemMappingApi.getSuggestions()
+      .then(res => setSuggestions(res.data?.data || []))
+      .catch(() => { /* suggestion opsional, silent fail ok */ })
+  }, [])
+  function applySuggestion(s) {
+    setAppliedKeyword(s.description)  // simpan keyword untuk filter ulang saat disubmit
+    setForm({ keyword: s.description, planning_item: s.planning_item, kategori_id: '', priority: 1, is_active: true })
+    setEditData(null)
+    setShowForm(true)
+  }
+
+  function dismissSuggestion(s) {
+    // Hapus optimistis dulu dari UI, lalu simpan sebagai inactive ke backend
+    setSuggestions(prev => prev.filter(x => x.description !== s.description))
+    itemMappingApi.create({
+      keyword: s.description,
+      planning_item: s.planning_item,
+      kategori_id: null,
+      priority: 1,
+      is_active: false
+    }).catch(() => {
+      // Kalau gagal simpan, tampilkan toast (saran sudah hilang dari UI, tidak masalah)
+      toast.error('Gagal menyimpan dismiss — saran akan muncul lagi setelah refresh')
+    })
+  }
 
   async function fetchAll() {
     setLoading(true)
@@ -28,14 +57,29 @@ export default function ItemMapping() {
     finally { setLoading(false) }
   }
 
+  function closeForm() {
+    setShowForm(false)
+    setAppliedKeyword(null)
+  }
+
   function openCreate() { setForm({ keyword: '', planning_item: '', kategori_id: '', priority: 1, is_active: true }); setEditData(null); setShowForm(true) }
   function openEdit(m) { setForm({ keyword: m.keyword, planning_item: m.planning_item, kategori_id: m.kategori_id || '', priority: m.priority, is_active: m.is_active }); setEditData(m); setShowForm(true) }
 
   async function handleSubmit(e) {
     e.preventDefault()
     try {
-      if (editData) await itemMappingApi.update(editData.id, form)
-      else await itemMappingApi.create(form)
+      if (editData) {
+        await itemMappingApi.update(editData.id, form)
+        toast.success('Rule berhasil diupdate')
+      } else {
+        await itemMappingApi.create(form)
+        toast.success('Rule berhasil disimpan')
+        // Hapus saran dari list jika form ini berasal dari saran
+        if (appliedKeyword) {
+          setSuggestions(prev => prev.filter(x => x.description !== appliedKeyword))
+          setAppliedKeyword(null)
+        }
+      }
       setShowForm(false)
       fetchAll()
     } catch { toast.error('Gagal menyimpan') }
@@ -61,6 +105,20 @@ export default function ItemMapping() {
       </div>
 
       {error && <p className={styles.error}>{error}</p>}
+      {suggestions.length > 0 && (
+        <div className={styles.suggestionPanel}>
+          <h3 className={styles.suggestionTitle}>💡 Saran Rule dari Histori ({suggestions.length})</h3>
+          {suggestions.map((s, i) => (
+            <div key={i} className={styles.suggestionRow}>
+              <span>"{s.description}" → <strong>{s.planning_item}</strong> <em style={{ color: '#6b7280' }}>({s.jumlah_kemunculan}x dipilih)</em></span>
+              <div className={styles.suggestionActions}>
+                <button onClick={() => applySuggestion(s)} className={styles.btnPrimarySm}>+ Jadikan Rule</button>
+                <button onClick={() => dismissSuggestion(s)} className={styles.btnCancelSm}>Abaikan</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Form Modal */}
       {showForm && (
@@ -89,7 +147,7 @@ export default function ItemMapping() {
 
               <div className={styles.actionRow}>
                 <button type="submit" className={styles.btnPrimary}>Simpan</button>
-                <button type="button" onClick={() => setShowForm(false)} className={styles.btnCancel}>Batal</button>
+                <button type="button" onClick={closeForm} className={styles.btnCancel}>Batal</button>
               </div>
             </form>
           </div>
