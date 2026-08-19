@@ -33,7 +33,7 @@ Proses monitoring realisasi anggaran QC secara manual — mencocokkan setiap ite
 Setiap item PR diklasifikasikan ke kategori anggaran melalui tiga lapis, dari yang paling pasti ke yang paling probabilistik:
 1. **Layer 1 — Regex** (`ai/regex_engine.py`) — mendeteksi kode Form eksplisit (I-1/E-1/E-9) atau jenis barang yang sudah dikenal (mis. tools/perkakas), langsung dengan confidence 1.0. Ada pengecualian untuk jasa perbaikan (kata seperti "repair"/"service") agar tidak salah diklasifikasikan sebagai pembelian aset baru.
 2. **Layer 2 — Rule Base** (`ai/rule_base.py`) — fallback berbasis skor keyword CAPEX vs OPEX, hanya berjalan jika Layer 1 gagal menentukan Form.
-3. **Layer 3 — SVM (TF-IDF)** — fallback terakhir menggunakan model machine learning untuk kasus yang tidak tertangkap dua layer sebelumnya.
+3. **Layer 3 — SVM (TF-IDF)** — fallback terakhir menggunakan model machine learning untuk kasus yang tidak tertangkap dua layer sebelumnya--->Terbatas hanya untuk Form E-1 dan E-9 karena keterbatasan jumlah data untuk Form I-1.
 
 Setiap hasil klasifikasi tercatat lengkap dengan layer, metode, dan confidence score di `klasifikasi_log`.
 
