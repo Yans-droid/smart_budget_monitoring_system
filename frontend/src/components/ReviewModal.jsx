@@ -41,7 +41,7 @@ export default function ReviewModal({ record, categories, onClose, onSuccess }) 
         kategori_id_koreksi: parseInt(selectedCat, 10),
         direview_oleh: user?.id,
       })
-      
+
       if (res.success) {
         onSuccess(res.data)
       } else {
@@ -123,7 +123,7 @@ export default function ReviewModal({ record, categories, onClose, onSuccess }) 
                 opacity: (loading || approving) ? 0.6 : 1,
               }}
             >
-              {approving ? '⏳ Menyetujui...' : '✓ ACC Tanpa Review'}
+              {approving ? '⏳ Menyetujui...' : '✓ ACC '}
             </button>
             <button type="submit" className="btn-primary" disabled={loading || approving}>
               {loading ? 'Menyimpan...' : 'Simpan Perubahan'}

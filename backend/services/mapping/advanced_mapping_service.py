@@ -47,6 +47,11 @@ class AdvancedMappingService:
     def run_mapping(pr: PrPoData):
         start_time = time.time()
 
+        # 0. Bersihkan SEMUA mapping log lama agar hasil koreksi/re-run tidak tumpang tindih
+        MappingLog.query.filter_by(pr_po_data_id=pr.id).delete()
+        pr.planning_detail_id = None
+        db.session.flush()
+
         # 1. Ekstrak tahun dari pr_doc_num
         periode = AdvancedMappingService.extract_periode(pr.pr_doc_num)
         if not periode:
@@ -82,7 +87,11 @@ class AdvancedMappingService:
         search_text = f"{description} {comment_text}"
 
         rules = ItemMapping.query.filter_by(is_active=True).order_by(ItemMapping.priority.asc()).all()
-        valid_rules = [r for r in rules if r.kategori_id == pr.kategori_id or r.kategori_id is None]
+        # Jika pr punya kategori_id_koreksi (artinya manual review), JANGAN Terapkan Rule yang Kategori-nya beda!
+        if pr.kategori_id_koreksi:
+            valid_rules = [r for r in rules if r.kategori_id == pr.kategori_id_koreksi]
+        else:
+            valid_rules = [r for r in rules if r.kategori_id == pr.kategori_id or r.kategori_id is None]
 
         matched_planning_item = None
         for rule in valid_rules:
@@ -110,6 +119,9 @@ class AdvancedMappingService:
                 pr.kategori_id = exact_detail.kategori_id
                 pr.planning_detail_id = exact_detail.id
                 pr.status_ai = "DONE"
+                
+                # Jangan merubah pr.perlu_review menjadi True.
+                # pr.perlu_review murni untuk klasifikasi (E-1, E-9).
 
                 proc_time = time.time() - start_time
                 log = MappingLog(
@@ -123,9 +135,6 @@ class AdvancedMappingService:
                 db.session.add(log)
                 db.session.commit()
                 return {"success": True, "message": "Mapped via Rule", "status": "DONE"}
-
-        # Bersihkan log FUZZY lama untuk PR ini jika ada
-        MappingLog.query.filter_by(pr_po_data_id=pr.id, method="FUZZY_MATCH").delete()
 
         # 5. Fuzzy matching — Coba bulan yang sama dulu
         candidates = PlanningDetail.query.filter(
@@ -196,7 +205,6 @@ class AdvancedMappingService:
 
         if not final_results:
             pr.status_ai = "OUT_OF_PLAN"
-            pr.perlu_review = True
             db.session.commit()
             return {"success": False, "message": "Tidak ada kandidat di kategori ini", "status": "OUT_OF_PLAN"}
 
@@ -218,7 +226,7 @@ class AdvancedMappingService:
             rank += 1
 
         pr.status_ai = "NEED_MAPPING"
-        pr.perlu_review = True
         db.session.commit()
         return {"success": True, "message": "Mapped via Fuzzy (Needs Review)", "status": "NEED_MAPPING"}
+
 

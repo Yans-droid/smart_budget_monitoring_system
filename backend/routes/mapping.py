@@ -30,7 +30,8 @@ def get_pending_mapping():
     if keyword:
         query = query.filter(
             (PrPoData.pr_doc_num.ilike(f"%{keyword}%")) |
-            (PrPoData.description.ilike(f"%{keyword}%"))
+            (PrPoData.description.ilike(f"%{keyword}%")) |
+            (PrPoData.comment_text.ilike(f"%{keyword}%"))
         )
     pagination = query.order_by(PrPoData.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
     

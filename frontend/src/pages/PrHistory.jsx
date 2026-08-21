@@ -15,17 +15,19 @@ export default function PrHistory() {
   const [filterStatus, setFilterStatus] = useState('')
   const [trackingStage, setTrackingStage] = useState('')
   const [uploadId, setUploadId] = useState('')
+  const [search, setSearch] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const CURRENT_YEAR = String(new Date().getFullYear())
 
   // Fetch Data Query
   const { data: listData, isLoading: loading, refetch } = useQuery({
-    queryKey: ['prHistory', page, filterStatus, trackingStage, uploadId],
+    queryKey: ['prHistory', page, filterStatus, trackingStage, uploadId, search],
     queryFn: async () => {
       const params = { page, per_page: 30 }
       if (filterStatus) params.status_ai = filterStatus
       if (trackingStage) params.tracking_stage = trackingStage
       if (uploadId) params.upload_id = parseInt(uploadId)
+      if (search) params.search = search
       const res = await prApi.getAll(params)
       return res.data
     }
@@ -150,6 +152,13 @@ export default function PrHistory() {
 
       {/* Filters */}
       <div className={styles.filters}>
+        <input
+          placeholder="Cari PR / Deskripsi..."
+          value={search}
+          onChange={e => { setSearch(e.target.value); setPage(1) }}
+          className={styles.input}
+          style={{ minWidth: 200 }}
+        />
         <input
           placeholder="Upload ID"
           value={uploadId}

@@ -270,18 +270,20 @@ export default function Dashboard() {
                 variant={(prSummary?.remaining_budget || 0) < 0 ? 'danger' : 'success'}
               />
               <MetricCard
-                label="Plan Cancelled"
-                value={prSummary?.cancelled_count || 0}
-                sub={`${formatRp(prSummary?.cancelled_amount || 0)}`}
+                label="Total Cancelled"
+                value={(prSummary?.cancelled_count || 0) + (prSummary?.cancelled_pr_count || 0)}
+                sub={
+                  <div style={{ display: 'flex', gap: '8px', fontSize: '0.8rem', opacity: 0.9 }}>
+                    <span onClick={(e) => { e.stopPropagation(); setShowCancelledPlanningModal(true); }} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
+                      Plan: {prSummary?.cancelled_count || 0}
+                    </span>
+                    <span>|</span>
+                    <span onClick={(e) => { e.stopPropagation(); setSelectedForm('CANCELLED_PR'); }} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
+                      PR: {prSummary?.cancelled_pr_count || 0}
+                    </span>
+                  </div>
+                }
                 variant="danger"
-                onClick={() => setShowCancelledPlanningModal(true)}
-              />
-              <MetricCard
-                label="PR Cancelled"
-                value={prSummary?.cancelled_pr_count || 0}
-                sub="Dibatalkan langsung"
-                variant="default"
-                onClick={() => setSelectedForm('CANCELLED_PR')}
               />
             </div>
           </section>

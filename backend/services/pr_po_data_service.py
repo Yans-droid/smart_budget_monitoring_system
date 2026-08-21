@@ -48,7 +48,8 @@ class PrPoDataService:
             query = query.filter(
                 PrPoData.pr_doc_num.ilike(term) |
                 PrPoData.description.ilike(term) |
-                PrPoData.supplier_name.ilike(term)
+                PrPoData.supplier_name.ilike(term) |
+                PrPoData.comment_text.ilike(term)
             )
 
         # --- Filter berdasarkan kode kategori (via join ke Kategori) ---

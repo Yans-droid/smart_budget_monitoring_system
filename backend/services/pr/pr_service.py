@@ -18,7 +18,14 @@ class PrService:
         if kategori_id:
             query = query.filter(PrPoData.kategori_id == kategori_id)
         if search:
-            query = query.filter(PrPoData.description.ilike(f"%{search}%"))
+            from sqlalchemy import or_
+            query = query.filter(
+                or_(
+                    PrPoData.description.ilike(f"%{search}%"),
+                    PrPoData.pr_doc_num.ilike(f"%{search}%"),
+                    PrPoData.comment_text.ilike(f"%{search}%")
+                )
+            )
             
         if filter_status == "PENDING":
             query = query.filter(PrPoData.perlu_review == True)
@@ -124,8 +131,7 @@ class PrService:
         pr.kategori_id_koreksi = kategori_id
         pr.direview_oleh = user_id
         pr.direview_at = datetime.utcnow()
-        # Jangan hardcode pr.perlu_review = False di sini. 
-        # Biarkan run_mapping() yang menentukan status akhirnya.
+        pr.perlu_review = False  # Set False karena user sudah melakukan review klasifikasi secara manual
 
         db.session.commit()
 

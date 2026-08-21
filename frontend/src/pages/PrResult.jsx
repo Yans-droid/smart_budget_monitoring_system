@@ -114,7 +114,7 @@ export default function PrResult() {
       {/* Filters */}
       <div className={styles.filters}>
         <input
-          placeholder="Cari nama item..."
+          placeholder="Cari PR, deskripsi, komentar..."
           value={searchItem}
           onChange={e => { setSearchItem(e.target.value); setPage(1) }}
           className={styles.input}
